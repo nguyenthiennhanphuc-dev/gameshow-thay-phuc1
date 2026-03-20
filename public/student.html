@@ -265,6 +265,15 @@
     <script>
         const socket = io();
         let currentRoomPin = '';
+        // Tự động lấy mã PIN từ link QR Code và điền vào ô
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pinFromUrl = urlParams.get('pin');
+            if (pinFromUrl) {
+                document.getElementById('pinInput').value = pinFromUrl;
+                document.getElementById('nameInput').focus(); // Tự động nhảy con trỏ xuống ô nhập Tên
+            }
+        };
         let myScore = 0; 
         let myName = ''; 
         const correctSound = new Audio('/sounds/dung.mp3');
