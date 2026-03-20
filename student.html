@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Màn hình Học sinh</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@latest/Sortable.min.js"></script>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    
+    <style>
+        body { 
+            font-family: 'Nunito', sans-serif; 
+            text-align: center; 
+            margin: 0; 
+            padding-top: 50px; 
+            background: linear-gradient(135deg, #fff9c4 0%, #fff176 100%); 
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        .card {
+            background: white; padding: 30px; border-radius: 20px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
+            max-width: 600px; margin: 0 auto;
+        }
+
+        h1 { color: #1565C0; margin-top: 0; }
+        
+        input { 
+            padding: 15px; font-size: 18px; margin: 10px 0; width: 100%; 
+            border-radius: 12px; border: 2px solid #ccc; text-align: center;
+            box-sizing: border-box; font-family: 'Nunito', sans-serif;
+            transition: border-color 0.3s;
+        }
+        input:focus { border-color: #2196F3; outline: none; }
+        
+        button.actionBtn { 
+            padding: 15px 30px; font-size: 20px; font-weight: bold; cursor: pointer; 
+            background-color: #2196F3; color: white; border: none; border-radius: 12px; 
+            width: 100%; margin-top: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        #waitingScreen { display: none; font-size: 24px; color: #4CAF50; margin-top: 30px; }
+        
+        #miniScore { position: absolute; top: 15px; right: 20px; font-size: 20px; font-weight: 900; background: #fff; padding: 8px 20px; border-radius: 30px; border: 3px solid #ff9800; color: #ff9800; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        #miniTimer { position: absolute; top: 15px; left: 20px; font-size: 20px; font-weight: 900; background: #fff; padding: 8px 20px; border-radius: 30px; border: 3px solid #E53935; color: #E53935; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+        .answerGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 600px; margin: 0 auto; padding: 0 20px; }
+        .answerBtn { 
+            height: 150px; font-size: 36px; color: white; font-weight: 900; 
+            border: none; border-radius: 15px; cursor: pointer; 
+            box-shadow: 0 8px 0px rgba(0,0,0,0.2); 
+            transition: transform 0.1s, box-shadow 0.1s;
+            font-family: 'Nunito', sans-serif;
+        }
+        .answerBtn:active { transform: translateY(8px); box-shadow: 0 0px 0px rgba(0,0,0,0.2); }
+        .btn-a { background-color: #E21B3C; }
+        .btn-b { background-color: #1368CE; }
+        .btn-c { background-color: #D89E00; }
+        .btn-d { background-color: #26890C; }
+
+        #resultScreen { display: none; padding: 40px 20px; margin: 30px auto; border-radius: 20px; color: white; max-width: 600px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        #finalScreen { display: none; padding: 40px; margin: 30px auto; border-radius: 20px; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.15); max-width: 600px; }
+        
+        #fillBlankContainer { display: none; margin-top: 20px; padding: 0 20px; }
+        #fillBlankInput { 
+            width: 100%; max-width: 600px; padding: 20px; font-size: 24px; 
+            border-radius: 15px; border: 3px solid #2196F3; font-weight: bold;
+        }
+        #btnSubmitFillBlank { background-color: #4CAF50; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 600px;}
+
+        /* CSS Sắp xếp thứ tự */
+        #dragDropContainer { display: none; margin-top: 20px; padding: 0 20px; }
+        #sortableList { list-style-type: none; padding: 0; margin: 0; max-width: 600px; margin: 0 auto; counter-reset: slot-counter; }
+        .sortable-item { 
+            background-color: #fff; border: 2px solid #FF9800; color: #E65100;
+            padding: 18px 15px 18px 65px; margin-bottom: 15px; border-radius: 12px; font-size: 22px; font-weight: bold;
+            cursor: grab; box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex; align-items: center; justify-content: flex-start; text-align: left;
+            position: relative; transition: transform 0.1s;
+        }
+        .sortable-item::before {
+            counter-increment: slot-counter; content: counter(slot-counter); position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+            background-color: #FF9800; color: white; width: 35px; height: 35px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 900; box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .sortable-item:active { cursor: grabbing; box-shadow: 0 8px 15px rgba(0,0,0,0.2); transform: scale(1.02); z-index: 10; }
+        .sortable-ghost { opacity: 0.3; background-color: #FFF3E0; border-style: dashed; } 
+        #btnSubmitDragDrop { background-color: #FF9800; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 600px;}
+
+        /* CSS Ghép tranh */
+        #imageMatchContainer { display: none; margin-top: 20px; padding: 0 20px; }
+        .image-match-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 800px; margin: 0 auto; }
+        .im-student-card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 45%; min-width: 200px; }
+        .im-student-card img { width: 100%; height: 160px; object-fit: contain; border-radius: 10px; margin-bottom: 10px; background: #f9f9f9; }
+        .im-student-input { width: 100%; padding: 15px; font-size: 18px; border: 2px solid #CE93D8; border-radius: 8px; box-sizing: border-box; text-align: center; font-family: 'Nunito', sans-serif; font-weight: bold;}
+        .im-student-input:focus { border-color: #9C27B0; outline: none; }
+        #btnSubmitImageMatch { background-color: #AB47BC; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 600px; }
+
+        /* CSS Phân loại nhóm */
+        #classifyContainer { display: none; margin-top: 20px; padding: 0 10px; max-width: 600px; margin-left: auto; margin-right: auto;}
+        .word-bank { 
+            min-height: 80px; background: #FFF3E0; border: 2px dashed #FF9800; border-radius: 12px; 
+            padding: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;
+        }
+        .word-bank-title { width: 100%; font-size: 18px; color: #E65100; font-weight: bold; margin-bottom: 5px;}
+        
+        .classify-dropzone { 
+            min-height: 100px; background: #E0F2F1; border: 2px solid #00897B; border-radius: 12px; 
+            padding: 15px; margin-bottom: 15px; display: flex; flex-wrap: wrap; gap: 10px; align-items: flex-start;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .classify-dropzone-title { width: 100%; font-size: 20px; color: #00695C; font-weight: 900; margin-bottom: 10px; border-bottom: 2px solid #B2DFDB; padding-bottom: 5px; text-align: left;}
+        
+        .drag-item { 
+            background: white; border: 2px solid #00897B; color: #00695C; padding: 10px 15px; 
+            border-radius: 8px; font-size: 18px; font-weight: bold; cursor: grab; 
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1); user-select: none; display: inline-block;
+        }
+        .drag-item:active { cursor: grabbing; transform: scale(1.05); box-shadow: 0 4px 8px rgba(0,0,0,0.2); z-index: 10;}
+        .item-ghost { opacity: 0.4; border-style: dashed; }
+        
+        #btnSubmitClassify { background-color: #00897B; font-size: 24px; margin-top: 10px; padding: 15px; width: 100%; }
+
+        /* CSS Kéo thả đoạn văn */
+        #dragTextContainer { display: none; margin-top: 20px; padding: 0 15px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        .text-passage {
+            background: #E8EAF6; padding: 25px; border-radius: 15px; border: 2px solid #3F51B5;
+            font-size: 22px; color: #1A237E; line-height: 2; text-align: left; margin-bottom: 20px;
+            box-shadow: inset 0 4px 8px rgba(0,0,0,0.05);
+        }
+        .text-dropzone {
+            display: inline-flex; min-width: 120px; min-height: 45px; background: #fff;
+            border: 2px dashed #7986CB; border-radius: 8px; vertical-align: middle;
+            align-items: center; justify-content: center; padding: 2px 5px; margin: 0 8px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+        }
+        #btnSubmitDragText { background-color: #3F51B5; font-size: 24px; margin-top: 10px; padding: 15px; width: 100%; }
+
+        /* THÊM MỚI: CSS Kéo thả vào Hình ảnh (Chấm tọa độ) */
+        #dragImageContainer { display: none; margin-top: 20px; padding: 0 15px; max-width: 800px; margin-left: auto; margin-right: auto; }
+        .di-wrapper { 
+            position: relative; display: inline-block; max-width: 100%; 
+            border: 2px solid #4CAF50; border-radius: 8px; overflow: hidden; background: #fff;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+        .di-wrapper img { max-width: 100%; max-height: 450px; display: block; user-select: none; pointer-events: none;}
+        .di-dropzone {
+            position: absolute; min-width: 80px; min-height: 45px; background: rgba(255, 255, 255, 0.9);
+            border: 2px dashed #4CAF50; border-radius: 8px; transform: translate(-50%, -50%); /* Căn giữa tâm */
+            display: flex; align-items: center; justify-content: center; padding: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        }
+        #btnSubmitDragImage { background-color: #4CAF50; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; }
+        .history-table { width: 100%; border-collapse: collapse; margin-top: 20px; font-size: 16px; text-align: left; }
+        .history-table th, .history-table td { border: 1px solid #ddd; padding: 12px; }
+        .history-table th { background-color: #2196F3; color: white; text-align: center;}
+        .history-table tr:nth-child(even) { background-color: #f2f2f2; }
+        .correct-row { border-left: 5px solid #4CAF50 !important; }
+        .wrong-row { border-left: 5px solid #F44336 !important; }
+    </style>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+</head>
+<body>
+    <div id="miniScore">Điểm: <span id="currentScore">0</span></div>
+    <div id="miniTimer">⏳ <span id="studentTimeText">20</span></div>
+
+    <div id="joinForm" class="card">
+        <h1>Vào Lớp Học</h1>
+        <input type="number" id="pinInput" placeholder="Mã PIN (6 số)"><br>
+        <input type="text" id="nameInput" placeholder="Tên của bạn"><br>
+        <button id="btnJoin" class="actionBtn">Tham gia ngay</button>
+        <p id="errorMessage" style="color: red; font-weight: bold; margin-top: 15px;"></p>
+    </div>
+
+    <div id="waitingScreen" class="card">
+        <h2>Bạn đã vào lớp! 🎉</h2>
+        <p style="color: #666;">Hãy nhìn lên màn hình của giáo viên và chờ trò chơi bắt đầu...</p>
+    </div>
+
+    <div id="playScreen" style="display: none;">
+        <h2 id="questionIndicator" style="color: #333;">Chọn đáp án:</h2>
+        
+        <div class="answerGrid" id="btnContainer">
+            <button class="answerBtn btn-a" data-index="0" id="btnA">A</button>
+            <button class="answerBtn btn-b" data-index="1" id="btnB">B</button>
+            <button class="answerBtn btn-c" data-index="2" id="btnC">C</button>
+            <button class="answerBtn btn-d" data-index="3" id="btnD">D</button>
+        </div>
+
+        <div id="fillBlankContainer">
+            <input type="text" id="fillBlankInput" placeholder="Gõ câu trả lời vào đây..." autocomplete="off">
+            <button id="btnSubmitFillBlank" class="actionBtn">🚀 Gửi Đáp Án</button>
+        </div>
+
+        <div id="dragDropContainer">
+            <p style="color: #E65100; font-weight: bold; margin-bottom: 15px; font-size: 18px;">Kéo thả các khối để sắp xếp đúng thứ tự (1, 2, 3...):</p>
+            <ul id="sortableList"></ul>
+            <button id="btnSubmitDragDrop" class="actionBtn">🚀 Chốt Đáp Án</button>
+        </div>
+
+        <div id="imageMatchContainer">
+            <div class="image-match-grid" id="imageMatchGrid"></div>
+            <button id="btnSubmitImageMatch" class="actionBtn">🚀 Chốt Đáp Án Ghép Tranh</button>
+        </div>
+
+        <div id="classifyContainer">
+            <div class="word-bank" id="wordBankArea">
+                <div class="word-bank-title">👇 KHO TỪ (Kéo các từ ở đây thả xuống các giỏ)</div>
+                <div id="wordBankList" style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; min-height: 50px; align-items: center; justify-content: center;"></div>
+            </div>
+            <div id="categoriesArea"></div>
+            <button id="btnSubmitClassify" class="actionBtn">🚀 Chốt Đáp Án Phân Loại</button>
+        </div>
+
+        <div id="dragTextContainer">
+            <div class="word-bank" id="dragTextWordBankArea" style="background: #E8EAF6; border-color: #3F51B5;">
+                <div class="word-bank-title" style="color: #1A237E;">👇 KHO TỪ (Kéo từ để lấp vào ô trống)</div>
+                <div id="dragTextWordBank" style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; min-height: 50px; align-items: center; justify-content: center;"></div>
+            </div>
+            <div id="dragTextPassage" class="text-passage"></div>
+            <button id="btnSubmitDragText" class="actionBtn">🚀 Chốt Đáp Án Đoạn Văn</button>
+        </div>
+
+        <div id="dragImageContainer">
+            <div class="word-bank" id="dragImageWordBankArea" style="background: #E8F5E9; border-color: #4CAF50;">
+                <div class="word-bank-title" style="color: #1B5E20;">👇 KHO TỪ (Kéo nhãn dán thả vào đúng vị trí trên ảnh)</div>
+                <div id="dragImageWordBank" style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; min-height: 50px; align-items: center; justify-content: center;"></div>
+            </div>
+            
+            <div class="di-wrapper" id="diStudentWrapper">
+                <img id="diStudentImg" src="" alt="Hình nền bài tập">
+                <div id="diStudentZonesArea" style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></div>
+            </div>
+            
+            <button id="btnSubmitDragImage" class="actionBtn">🚀 Chốt Đáp Án Trên Ảnh</button>
+        </div>
+    </div>
+
+    <div id="resultScreen">
+        <h1 id="resultTitle" style="font-size: 40px; margin: 0;"></h1>
+        <p id="scoreDisplay" style="font-size: 24px; margin-top: 15px; font-weight: bold;"></p>
+    </div>
+
+    <div id="finalScreen">
+        <h1 style="color: #4CAF50; font-size: 40px; margin-top: 0;">🎉 KẾT THÚC 🎉</h1>
+        <h2 id="finalRank" style="font-size: 36px; color: #ff9800; margin: 20px 0;"></h2>
+        <h3 id="finalScoreText" style="font-size: 28px; color: #333;"></h3>
+        <p style="color: #666; font-weight: bold;">Cảm ơn bạn đã tham gia!</p>
+        <div id="historyTableContainer" style="overflow-x: auto;"></div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let currentRoomPin = '';
+        // Tự động lấy mã PIN từ link QR Code và điền vào ô
+        window.onload = () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const pinFromUrl = urlParams.get('pin');
+            if (pinFromUrl) {
+                document.getElementById('pinInput').value = pinFromUrl;
+                document.getElementById('nameInput').focus(); // Tự động nhảy con trỏ xuống ô nhập Tên
+            }
+        };
+        let myScore = 0; 
+        let myName = ''; 
+        const correctSound = new Audio('/sounds/dung.mp3');
+        const wrongSound = new Audio('/sounds/sai.wav');
+
+        const sortableListElement = document.getElementById('sortableList');
+        new Sortable(sortableListElement, {
+            animation: 200, 
+            ghostClass: 'sortable-ghost'
+        });
+
+        window.classifySortables = [];
+        window.dragTextSortables = [];
+        window.dragImageSortables = []; // TÍNH NĂNG MỚI: Mảng quản lý Sortable cho dạng Ảnh
+
+        document.getElementById('btnJoin').addEventListener('click', () => {
+            const pin = document.getElementById('pinInput').value;
+            const name = document.getElementById('nameInput').value;
+            
+            if(pin && name) {
+                currentRoomPin = pin; 
+                myName = name; 
+                socket.emit('joinRoom', { pin: pin, name: name });
+            } else {
+                document.getElementById('errorMessage').innerText = "Vui lòng nhập đủ PIN và Tên!";
+            }
+        });
+
+        socket.on('joinSuccess', () => {
+            document.getElementById('joinForm').style.display = 'none';
+            document.getElementById('waitingScreen').style.display = 'block';
+        });
+
+        socket.on('joinError', (msg) => {
+            document.getElementById('errorMessage').innerText = msg;
+        });
+
+        socket.on('showAnswerButtons', (payload) => {
+            document.getElementById('waitingScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('playScreen').style.display = 'block';
+            
+            document.getElementById('miniScore').style.display = 'block';
+            document.getElementById('currentScore').innerText = myScore;
+
+            document.getElementById('miniTimer').style.display = 'block';
+            document.getElementById('studentTimeText').innerText = '20';
+
+            const btnContainer = document.getElementById('btnContainer');
+            const fillBlankContainer = document.getElementById('fillBlankContainer');
+            const dragDropContainer = document.getElementById('dragDropContainer');
+            const imageMatchContainer = document.getElementById('imageMatchContainer');
+            const classifyContainer = document.getElementById('classifyContainer'); 
+            const dragTextContainer = document.getElementById('dragTextContainer'); 
+            const dragImageContainer = document.getElementById('dragImageContainer'); // THÊM MỚI
+            const indicator = document.getElementById('questionIndicator');
+
+            let qType = 'multiple_choice';
+            let shuffledAnswers = [];
+            let imagesForMatch = [];
+            let categoriesForClassify = [];
+            let wordBankForDrag = [];
+            let textPartsForDrag = [];
+            let dropZonesForImage = [];
+            let mainImageForDrag = "";
+            
+            if (typeof payload === 'string') {
+                qType = payload;
+            } else if (payload && payload.type) {
+                qType = payload.type;
+                shuffledAnswers = payload.shuffledAnswers || [];
+                imagesForMatch = payload.images || [];
+                categoriesForClassify = payload.categories || [];
+                wordBankForDrag = payload.wordBank || [];
+                textPartsForDrag = payload.textParts || [];
+                dropZonesForImage = payload.dropZones || [];
+                mainImageForDrag = payload.mainImage || "";
+            }
+
+            btnContainer.style.display = 'none';
+            fillBlankContainer.style.display = 'none';
+            dragDropContainer.style.display = 'none';
+            imageMatchContainer.style.display = 'none';
+            classifyContainer.style.display = 'none';
+            dragTextContainer.style.display = 'none';
+            dragImageContainer.style.display = 'none';
+
+            if (qType === 'fill_blank') {
+                fillBlankContainer.style.display = 'block';
+                indicator.innerText = "Gõ câu trả lời của bạn:";
+                document.getElementById('fillBlankInput').value = '';
+                document.getElementById('fillBlankInput').focus();
+                
+            } else if (qType === 'drag_drop') {
+                dragDropContainer.style.display = 'block';
+                indicator.innerText = "Sắp xếp theo thứ tự chính xác:";
+                
+                sortableListElement.innerHTML = '';
+                shuffledAnswers.forEach(ans => {
+                    const li = document.createElement('li');
+                    li.className = 'sortable-item';
+                    const span = document.createElement('span');
+                    span.innerText = ans;
+                    li.appendChild(span);
+                    sortableListElement.appendChild(li);
+                });
+                
+            } else if (qType === 'image_match') {
+                imageMatchContainer.style.display = 'block';
+                indicator.innerText = "Quan sát tranh và điền từ thích hợp vào ô:";
+                const grid = document.getElementById('imageMatchGrid');
+                grid.innerHTML = '';
+                imagesForMatch.forEach((imgUrl, index) => {
+                    const card = document.createElement('div');
+                    card.className = 'im-student-card';
+                    card.innerHTML = `
+                        <img src="${imgUrl}" alt="Hình ${index+1}">
+                        <input type="text" class="im-student-input" placeholder="Điền từ...">
+                    `;
+                    grid.appendChild(card);
+                });
+
+            } else if (qType === 'drag_classify') {
+                classifyContainer.style.display = 'block';
+                indicator.innerText = "Kéo các từ ở Kho và thả vào đúng Nhóm:";
+
+                const wordBankList = document.getElementById('wordBankList');
+                const categoriesArea = document.getElementById('categoriesArea');
+                wordBankList.innerHTML = '';
+                categoriesArea.innerHTML = '';
+
+                if (window.classifySortables.length > 0) {
+                    window.classifySortables.forEach(s => s.destroy());
+                    window.classifySortables = [];
+                }
+
+                wordBankForDrag.forEach(word => {
+                    const div = document.createElement('div');
+                    div.className = 'drag-item';
+                    div.style.borderColor = '#FF9800'; 
+                    div.style.color = '#E65100';
+                    div.innerText = word;
+                    wordBankList.appendChild(div);
+                });
+
+                window.classifySortables.push(new Sortable(wordBankList, { group: 'shared', animation: 150, ghostClass: 'item-ghost' }));
+
+                categoriesForClassify.forEach(catName => {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'classify-dropzone';
+                    const title = document.createElement('div');
+                    title.className = 'classify-dropzone-title';
+                    title.innerText = catName;
+                    wrap.appendChild(title);
+                    const dropArea = document.createElement('div');
+                    dropArea.style.display = 'flex';
+                    dropArea.style.flexWrap = 'wrap';
+                    dropArea.style.gap = '10px';
+                    dropArea.style.width = '100%';
+                    dropArea.style.minHeight = '50px';
+                    dropArea.dataset.catName = catName; 
+                    wrap.appendChild(dropArea);
+                    categoriesArea.appendChild(wrap);
+
+                    window.classifySortables.push(new Sortable(dropArea, { group: 'shared', animation: 150, ghostClass: 'item-ghost' }));
+                });
+
+            } else if (qType === 'drag_text') {
+                dragTextContainer.style.display = 'block';
+                indicator.innerText = "Lấy từ trong Kho điền vào ô trống cho đoạn văn có ý nghĩa:";
+
+                const wordBankArea = document.getElementById('dragTextWordBank');
+                const passageArea = document.getElementById('dragTextPassage');
+                wordBankArea.innerHTML = '';
+                passageArea.innerHTML = '';
+
+                if (window.dragTextSortables && window.dragTextSortables.length > 0) {
+                    window.dragTextSortables.forEach(s => s.destroy());
+                    window.dragTextSortables = [];
+                }
+
+                wordBankForDrag.forEach(word => {
+                    const div = document.createElement('div');
+                    div.className = 'drag-item';
+                    div.style.borderColor = '#3F51B5'; 
+                    div.style.color = '#1A237E';
+                    div.innerText = word;
+                    wordBankArea.appendChild(div);
+                });
+
+                window.dragTextSortables.push(new Sortable(wordBankArea, { group: 'text-shared', animation: 150, ghostClass: 'item-ghost' }));
+
+                textPartsForDrag.forEach((part, index) => {
+                    const spanText = document.createElement('span');
+                    spanText.innerText = part;
+                    passageArea.appendChild(spanText);
+
+                    if (index < textPartsForDrag.length - 1) {
+                        const dropZone = document.createElement('span');
+                        dropZone.className = 'text-dropzone';
+                        passageArea.appendChild(dropZone);
+
+                        window.dragTextSortables.push(new Sortable(dropZone, {
+                            group: 'text-shared', animation: 150, ghostClass: 'item-ghost',
+                            onAdd: function (evt) {
+                                if (dropZone.children.length > 1) { wordBankArea.appendChild(dropZone.children[0]); }
+                            }
+                        }));
+                    }
+                });
+
+            } else if (qType === 'drag_image') {
+                // TÍNH NĂNG MỚI: Render giao diện Kéo thả vào tọa độ Hình ảnh
+                dragImageContainer.style.display = 'block';
+                indicator.innerText = "Kéo nhãn dán thả vào đúng vị trí trên hình ảnh:";
+
+                const wordBankArea = document.getElementById('dragImageWordBank');
+                const zonesArea = document.getElementById('diStudentZonesArea');
+                const imgEl = document.getElementById('diStudentImg');
+                
+                wordBankArea.innerHTML = '';
+                zonesArea.innerHTML = '';
+                imgEl.src = mainImageForDrag;
+
+                // Xóa thư viện rác cũ
+                if (window.dragImageSortables && window.dragImageSortables.length > 0) {
+                    window.dragImageSortables.forEach(s => s.destroy());
+                    window.dragImageSortables = [];
+                }
+
+                // Render Kho từ
+                wordBankForDrag.forEach(word => {
+                    const div = document.createElement('div');
+                    div.className = 'drag-item';
+                    div.style.borderColor = '#4CAF50';
+                    div.style.color = '#1B5E20';
+                    div.innerText = word;
+                    wordBankArea.appendChild(div);
+                });
+
+                window.dragImageSortables.push(new Sortable(wordBankArea, {
+                    group: 'image-shared', animation: 150, ghostClass: 'item-ghost'
+                }));
+
+                // Render các vùng rỗng đè lên hình ảnh dựa vào X, Y
+                dropZonesForImage.forEach((z, idx) => {
+                    const dz = document.createElement('div');
+                    dz.className = 'di-dropzone';
+                    dz.style.left = `${z.x}%`;
+                    dz.style.top = `${z.y}%`;
+                    
+                    zonesArea.appendChild(dz);
+
+                    // Mỗi ô trống chỉ chứa 1 nhãn
+                    window.dragImageSortables.push(new Sortable(dz, {
+                        group: 'image-shared', animation: 150, ghostClass: 'item-ghost',
+                        onAdd: function (evt) {
+                            if (dz.children.length > 1) {
+                                wordBankArea.appendChild(dz.children[0]);
+                            }
+                        }
+                    }));
+                });
+
+            } else {
+                btnContainer.style.display = 'grid';
+                indicator.innerText = "Chọn đáp án trên màn hình Giáo viên:";
+                document.getElementById('btnA').innerText = 'A';
+                document.getElementById('btnB').innerText = 'B';
+                
+                if (qType === 'true_false') {
+                    // Nếu là Đúng/Sai thì giấu nút C và D
+                    document.getElementById('btnC').style.display = 'none';
+                    document.getElementById('btnD').style.display = 'none';
+                } else {
+                    // Nếu là Trắc nghiệm 4 đáp án thì hiện đủ
+                    document.getElementById('btnC').style.display = 'block';
+                    document.getElementById('btnD').style.display = 'block';
+                    document.getElementById('btnC').innerText = 'C';
+                    document.getElementById('btnD').innerText = 'D';
+                }
+                btnContainer.style.gridTemplateColumns = '1fr 1fr';
+            }
+            if (window.MathJax) { MathJax.typesetPromise(); }
+        });
+
+        socket.on('timerTick', (timeLeft) => { document.getElementById('studentTimeText').innerText = timeLeft; });
+
+        socket.on('timeUp', () => {
+            if (document.getElementById('playScreen').style.display === 'block') {
+                document.getElementById('playScreen').style.display = 'none';
+                const resultDiv = document.getElementById('resultScreen');
+                const resultTitle = document.getElementById('resultTitle');
+                const scoreDisplay = document.getElementById('scoreDisplay');
+                
+                resultDiv.style.display = 'block';
+                resultDiv.style.backgroundColor = '#9e9e9e'; 
+                resultTitle.innerText = "Hết giờ! ⏰";
+                scoreDisplay.innerText = "Điểm của bạn: " + myScore;
+            }
+        });
+
+        const buttons = document.querySelectorAll('.answerBtn');
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                const index = parseInt(this.getAttribute('data-index'));
+                socket.emit('submitAnswer', { pin: currentRoomPin, answerIndex: index });
+                document.getElementById('playScreen').style.display = 'none';
+            });
+        });
+
+        document.getElementById('btnSubmitFillBlank').addEventListener('click', () => {
+            const answerText = document.getElementById('fillBlankInput').value;
+            if (!answerText.trim()) { alert("Bạn chưa nhập đáp án kìa!"); return; }
+            socket.emit('submitAnswer', { pin: currentRoomPin, answerText: answerText });
+            document.getElementById('playScreen').style.display = 'none';
+        });
+
+        document.getElementById('btnSubmitDragDrop').addEventListener('click', () => {
+            const listItems = document.querySelectorAll('#sortableList .sortable-item span');
+            const answerArray = [];
+            listItems.forEach(item => { answerArray.push(item.innerText); });
+            if (answerArray.length === 0) return;
+            socket.emit('submitAnswer', { pin: currentRoomPin, answerArray: answerArray });
+            document.getElementById('playScreen').style.display = 'none';
+        });
+
+        document.getElementById('btnSubmitImageMatch').addEventListener('click', () => {
+            const inputs = document.querySelectorAll('.im-student-input');
+            const answerArray = [];
+            let allFilled = true;
+            inputs.forEach(inp => {
+                const val = inp.value.trim();
+                if (!val) allFilled = false;
+                answerArray.push(val);
+            });
+            if (!allFilled) { alert("Bạn phải điền từ vào TẤT CẢ các bức tranh nhé!"); return; }
+            socket.emit('submitAnswer', { pin: currentRoomPin, answerArray: answerArray });
+            document.getElementById('playScreen').style.display = 'none';
+        });
+
+        document.getElementById('btnSubmitClassify').addEventListener('click', () => {
+            const wordBankItems = document.querySelectorAll('#wordBankList .drag-item');
+            if (wordBankItems.length > 0) { alert("Bạn phải phân loại TẤT CẢ các từ trong kho vào các nhóm mới được nộp bài nhé!"); return; }
+
+            const answerObj = {};
+            const categoriesArea = document.getElementById('categoriesArea');
+            const dropZones = categoriesArea.querySelectorAll('div[data-cat-name]');
+
+            dropZones.forEach(zone => {
+                const catName = zone.dataset.catName;
+                const items = [];
+                zone.querySelectorAll('.drag-item').forEach(el => { items.push(el.innerText); });
+                answerObj[catName] = items;
+            });
+            socket.emit('submitAnswer', { pin: currentRoomPin, answerObj: answerObj });
+            document.getElementById('playScreen').style.display = 'none';
+        });
+
+        document.getElementById('btnSubmitDragText').addEventListener('click', () => {
+            const dropZones = document.querySelectorAll('#dragTextPassage .text-dropzone');
+            const answerArray = [];
+            let allFilled = true;
+            dropZones.forEach(zone => {
+                if (zone.children.length === 0) { allFilled = false; } 
+                else { answerArray.push(zone.children[0].innerText); }
+            });
+            if (!allFilled) { alert("Đoạn văn vẫn còn chỗ trống! Bạn phải kéo thả đủ từ vào TẤT CẢ các ô nhé!"); return; }
+            socket.emit('submitAnswer', { pin: currentRoomPin, answerArray: answerArray });
+            document.getElementById('playScreen').style.display = 'none';
+        });
+
+        // TÍNH NĂNG MỚI: Submit Kéo thả Tọa độ Ảnh
+        document.getElementById('btnSubmitDragImage').addEventListener('click', () => {
+            const zonesArea = document.getElementById('diStudentZonesArea');
+            const dropZones = zonesArea.querySelectorAll('.di-dropzone');
+            const answerArray = [];
+            let allFilled = true;
+
+            // Đọc thứ tự các ô theo cấu trúc DOM (khớp chuẩn với mảng Server gửi xuống)
+            dropZones.forEach(zone => {
+                if (zone.children.length === 0) {
+                    allFilled = false;
+                } else {
+                    answerArray.push(zone.children[0].innerText.trim());
+                }
+            });
+
+            if (!allFilled) {
+                alert("Bạn chưa điền đủ nhãn dán vào hình ảnh! Hãy kiểm tra lại những ô còn trống nhé.");
+                return;
+            }
+
+            socket.emit('submitAnswer', { pin: currentRoomPin, answerArray: answerArray });
+            document.getElementById('playScreen').style.display = 'none';
+        });
+
+        socket.on('answerResult', (data) => {
+            const resultDiv = document.getElementById('resultScreen');
+            const resultTitle = document.getElementById('resultTitle');
+            const scoreDisplay = document.getElementById('scoreDisplay');
+            
+            myScore = data.score;
+            document.getElementById('currentScore').innerText = myScore;
+
+            resultDiv.style.display = 'block';
+            if (data.isCorrect) {
+                correctSound.currentTime = 0;
+                correctSound.play().catch(e => console.log(e));
+                resultDiv.style.backgroundColor = '#4CAF50'; 
+                resultTitle.innerText = "Chính xác! 🎉";
+            } else {
+                wrongSound.currentTime = 0;
+                wrongSound.play().catch(e => console.log(e));
+                resultDiv.style.backgroundColor = '#F44336'; 
+                resultTitle.innerText = "Sai mất rồi! 😥";
+            }
+            scoreDisplay.innerText = "Điểm của bạn: " + data.score;
+        });
+
+        socket.on('endGameStudent', (data) => {
+            document.getElementById('playScreen').style.display = 'none';
+            document.getElementById('resultScreen').style.display = 'none';
+            document.getElementById('miniScore').style.display = 'none';
+            document.getElementById('miniTimer').style.display = 'none'; 
+            document.getElementById('finalScreen').style.display = 'block';
+
+            const leaderboard = data.leaderboard;
+
+            let myRank = -1;
+            for (let i = 0; i < leaderboard.length; i++) {
+                if (leaderboard[i].name === myName) { myRank = i + 1; break; }
+            }
+
+            const rankText = document.getElementById('finalRank');
+            if (myRank === 1) { rankText.innerText = "🥇 BẠN XẾP HẠNG 1!"; } 
+            else if (myRank === 2) { rankText.innerText = "🥈 BẠN XẾP HẠNG 2!"; } 
+            else if (myRank === 3) { rankText.innerText = "🥉 BẠN XẾP HẠNG 3!"; } 
+            else { rankText.innerText = `Thứ hạng của bạn: ${myRank}`; }
+
+            document.getElementById('finalScoreText').innerText = `Tổng điểm: ${myScore}`;
+
+            const myHistory = data.history[socket.id] || [];
+            const quizData = data.quizData || [];
+            let tableHTML = '<table class="history-table"><tr><th>Câu hỏi</th><th>Đáp án của em</th></tr>';
+            quizData.forEach((q, idx) => {
+                const myAns = myHistory[idx] || "Không có dữ liệu";
+                const shortQ = q.question.length > 50 ? q.question.substring(0, 50) + "..." : q.question;
+                tableHTML += `<tr>
+                    <td><b>Câu ${idx + 1}:</b> ${shortQ}</td>
+                    <td style="color: #E65100; font-weight: bold;">${myAns}</td>
+                </tr>`;
+            });
+            tableHTML += '</table>';
+            document.getElementById('historyTableContainer').innerHTML = tableHTML;
+            if (window.MathJax) { MathJax.typesetPromise(); }
+        });
+    </script>
+</body>
+</html>

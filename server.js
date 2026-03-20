@@ -10,6 +10,21 @@ const io = new Server(server);
 
 app.use(express.static('public'));
 
+// Rút gọn link cho Học sinh (Trang chủ)
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public/student.html');
+});
+
+// Đường tắt cho Giáo viên (Màn hình Thi Trực Tiếp)
+app.get('/gv', (req, res) => {
+    res.sendFile(__dirname + '/public/teacher.html');
+});
+
+// Đường tắt cho Giáo viên (Màn hình Đấu Giá)
+app.get('/daugia', (req, res) => {
+    res.sendFile(__dirname + '/public/auction_teacher.html');
+});
+
 const BASE_URL = 'https://appthitructiep-default-rtdb.asia-southeast1.firebasedatabase.app';
 
 const rooms = {}; 
@@ -315,7 +330,6 @@ io.on('connection', (socket) => {
                     }
                 }
             } else if (currentQ.type === 'drag_image') {
-                // THÊM MỚI: Chấm điểm Kéo thả vào Ảnh (Kiểm tra xem các từ học sinh điền có khớp với vị trí tọa độ gốc không)
                 const studentAnsArray = (answerArray || []).map(str => (str || "").toString().trim().toLowerCase());
                 const correctAnsArray = (currentQ.dropZones || []).map(z => (z.answer || "").toString().trim().toLowerCase());
                 
@@ -345,7 +359,6 @@ io.on('connection', (socket) => {
             if(!rooms[pin].answerCounts) rooms[pin].answerCounts = [0,0,0,0];
             if(!rooms[pin].answeredCount) rooms[pin].answeredCount = 0;
 
-            // Bỏ qua biểu đồ A B C D nếu không phải trắc nghiệm
             if (currentQ.type !== 'fill_blank' && currentQ.type !== 'drag_drop' && currentQ.type !== 'image_match' && currentQ.type !== 'drag_classify' && currentQ.type !== 'drag_text' && currentQ.type !== 'drag_image') {
                 rooms[pin].answerCounts[answerIndex]++;
             }
