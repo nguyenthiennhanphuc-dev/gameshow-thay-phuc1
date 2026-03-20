@@ -118,6 +118,11 @@
 </head>
 <body>
     <h1>🌟 Bảng điều khiển của Giáo viên 🌟</h1>
+    <div id="serverNotice" style="background-color: #FFF9C4; color: #E65100; padding: 15px; border-radius: 10px; border: 2px dashed #F57F17; margin: 15px auto; max-width: 900px; font-size: 18px; font-weight: bold; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        ⚠️ LƯU Ý QUAN TRỌNG TRƯỚC KHI LÊN LỚP:<br>
+        <span style="font-size: 16px; font-weight: normal;">Hệ thống đang chạy trên máy chủ đám mây. Nếu không có ai truy cập trong 15 phút, máy chủ sẽ tạm "ngủ".<br>
+        👉 <b>Bí quyết:</b> Lần mở trang web đầu tiên của tiết học có thể mất <b>30 - 50 giây</b> để đánh thức máy chủ. Thầy/Cô vui lòng kiên nhẫn đợi một chút, sau khi thức dậy tốc độ sẽ mượt mà ngay lập tức!</span>
+    </div>
     
     <div id="loginScreen" class="card" style="margin-top: 20px; border: 3px solid #2196F3;">
         <h2 style="color: #1565C0; margin-top: 0;">🔐 Đăng nhập hệ thống</h2>
@@ -482,10 +487,8 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
 
             lines.forEach(line => {
                 let lowerLine = line.toLowerCase();
-                // Bắt cả trường hợp AI bôi đậm chữ hoặc tự chèn gạch đầu dòng, hỗ trợ thêm từ khóa 'ảnh nền'
                 if (lowerLine.match(/^\**\s*-?\s*(ảnh|link|image|ảnh nền)\s*\d*\**\s*:/)) {
                     let rawUrl = line.substring(line.indexOf(':') + 1).trim();
-                    
                     let httpMatch = rawUrl.match(/(https?:\/\/[^\s\>\]\)"']+)/);
                     if (httpMatch) {
                         imgLinks.push(httpMatch[1]);
@@ -500,7 +503,6 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 }
             });
 
-            // Chỉ nhồi ảnh vào phần chung nếu KHÔNG phải là 2 dạng đặc thù này
             if (type !== 'image_match' && type !== 'drag_image') {
                 if (imgLinks.length > 0 || imgCaps.length > 0) {
                     const container = document.getElementById('imageFieldsContainer');
@@ -539,7 +541,6 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                     }
                 }
                 document.getElementById('q1_correct').value = correctIdx;
-                document.getElementById('q1_text').value = questionLines.join('\n');
             } 
             else if (type === 'true_false') {
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -551,7 +552,6 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                         questionLines.push(remainingLines[i]);
                     }
                 }
-                document.getElementById('q1_text').value = questionLines.join('\n');
             } 
             else if (type === 'fill_blank') {
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -563,7 +563,6 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                         questionLines.push(remainingLines[i]);
                     }
                 }
-                document.getElementById('q1_text').value = questionLines.join('\n');
             } 
             else if (type === 'drag_drop') {
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -575,14 +574,12 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                         questionLines.push(remainingLines[i]);
                     }
                 }
-                document.getElementById('q1_text').value = questionLines.join('\n');
             } 
             else if (type === 'drag_text') {
                 if (remainingLines.length === 1) {
-                    document.getElementById('q1_text').value = "Hãy kéo thả từ thích hợp vào chỗ trống:";
                     document.getElementById('q1_drag_text_content').value = remainingLines[0];
                 } else {
-                    document.getElementById('q1_text').value = remainingLines[0];
+                    questionLines.push(remainingLines[0]);
                     document.getElementById('q1_drag_text_content').value = remainingLines.slice(1).join('\n');
                 }
             } 
@@ -591,11 +588,9 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 classCont.innerHTML = '';
                 for (let i = 0; i < remainingLines.length; i++) {
                     let line = remainingLines[i];
-                    // ĐÃ SỬA: Thêm chữ 'câu' vào regex để không nhận nhầm Câu hỏi thành Nhóm phân loại
                     if (line.includes(':') && !line.toLowerCase().match(/^\**\s*(câu|tiêu đề)/)) {
                         let parts = line.split(':');
                         let cName = parts[0].replace(/\*\*/g, '').trim();
-                        // Gộp các phần tử phía sau phòng trường hợp nội dung cũng có dấu hai chấm
                         let cItems = parts.slice(1).join(':').replace(/\*\*/g, '').trim();
                         
                         const div = document.createElement('div');
@@ -613,9 +608,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                     }
                 }
                 if (classCont.innerHTML === '') addClassifyGroup();
-                document.getElementById('q1_text').value = questionLines.join('\n');
             }
-            // XỬ LÝ MỚI: Bóc tách Ghép Tranh
             else if (type === 'image_match') {
                 let ansList = [];
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -642,9 +635,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                     matchCont.appendChild(div);
                 }
                 if (matchCont.innerHTML === '') addImageMatchPair();
-                document.getElementById('q1_text').value = questionLines.join('\n');
             }
-            // XỬ LÝ MỚI: Bóc tách Chấm tọa độ
             else if (type === 'drag_image') {
                 let labelList = [];
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -658,21 +649,40 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 }
                 
                 document.getElementById('di_main_image').value = imgLinks[0] || '';
-                document.getElementById('q1_text').value = questionLines.join('\n');
                 
-                // Tự động tạo các điểm neo chờ sẵn (dàn đều theo chiều dọc)
                 dragImageDropZones = [];
                 labelList.forEach((lbl, idx) => {
                     dragImageDropZones.push({ x: 50, y: 10 + (idx * 15), answer: lbl });
                 });
                 
                 if (imgLinks[0]) {
-                    loadDragImagePreview(); // Sẽ hiển thị ảnh và vẽ các điểm dummy vừa tạo lên ảnh
+                    loadDragImagePreview(); 
                 } else {
                     renderDragImageDropZones();
                 }
             }
             
+            // --- XỬ LÝ NỐI TIÊU ĐỀ THÔNG MINH ---
+            let parsedQText = questionLines.join('\n').trim();
+            const qTextBox = document.getElementById('q1_text');
+            const currentTitle = qTextBox.value.trim();
+            const defaultTitles = [
+                "Em hãy chọn đáp án đúng nhất:", "Nhận định sau đúng hay sai?",
+                "Điền từ thích hợp vào chỗ trống:", "Sắp xếp theo đúng thứ tự:",
+                "Sắp xếp vào nhóm phù hợp:", "Chọn từ phù hợp để hoàn chỉnh nội dung:",
+                "Nhấp vào vị trí đúng:", "Ghép từ với hình ảnh phù hợp:"
+            ];
+            
+            if (parsedQText) {
+                // Nếu ô nhập đang chứa đúng tiêu đề mặc định hoặc GV đã viết gì đó, thì nối bóc tách xuống dòng dưới
+                if (currentTitle) {
+                    qTextBox.value = currentTitle + "\n" + parsedQText;
+                } else {
+                    qTextBox.value = parsedQText;
+                }
+            }
+            // ------------------------------------
+
             document.getElementById('smartPasteInput').value = '';
             alert("✅ Bóc tách văn bản thành công! Các ô đã được tự động điền.");
         }
@@ -681,6 +691,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             const type = document.getElementById('q1_type').value;
             const instructionBox = document.getElementById('dynamic_instruction');
             const aiPromptBox = document.getElementById('aiPromptText');
+            const qTextBox = document.getElementById('q1_text'); 
             
             document.getElementById('mc_tf_rows').style.display = 'none';
             document.getElementById('correct_select_row').style.display = 'none';
@@ -697,7 +708,19 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             let multiQPrompt = "LƯU Ý QUAN TRỌNG DÀNH CHO BẠN:\\n1. Phải đánh dấu rõ từng câu (Ví dụ: Câu 1:, Câu 2:).\\n2. Trình bày mỗi thông tin/đáp án ở MỘT DÒNG RIÊNG BIỆT.\\n3. Giữa các câu hỏi phải cách nhau 1 dòng trống.\\n4. ĐỐI VỚI CÔNG THỨC TOÁN/LÝ/HÓA: Bắt buộc viết bằng chuẩn LaTeX và bọc trong cặp dấu $ (Ví dụ: $x^2 + y=1$). Tuyệt đối không bọc ký hiệu A, B, C, D vào trong dấu $\\n\\n";
             let baseImgPrompt = "\\nNếu câu hỏi có hình ảnh minh họa, hãy ghi rõ ở các dòng đáp án của câu hỏi theo đúng định dạng:\\nẢnh 1: [Mời bạn dán link ảnh 1 vào đây]\\nChú thích 1: [Ghi chú 1]\\nẢnh 2: [Mời bạn dán link ảnh 2 vào đây]\\nChú thích 2: [Ghi chú 2]\\n...Nếu không cần ảnh thì TUYỆT ĐỐI không ghi dòng này.";
 
+            // --- BẮT ĐẦU LOGIC ĐIỀN TIÊU ĐỀ THÔNG MINH ---
+            const defaultTitles = [
+                "", "Em hãy chọn đáp án đúng nhất:", "Nhận định sau đúng hay sai?",
+                "Điền từ thích hợp vào chỗ trống:", "Sắp xếp theo đúng thứ tự:",
+                "Sắp xếp vào nhóm phù hợp:", "Chọn từ phù hợp để hoàn chỉnh nội dung:",
+                "Nhấp vào vị trí đúng:", "Ghép từ với hình ảnh phù hợp:"
+            ];
+            const currentText = qTextBox.value.trim();
+            const canAutoFillTitle = defaultTitles.includes(currentText);
+            // --- KẾT THÚC LOGIC ---
+
             if (type === 'multiple_choice') {
+                if (canAutoFillTitle) qTextBox.value = "Em hãy chọn đáp án đúng nhất:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Trắc nghiệm 4 đáp án.<br>① Nhập câu hỏi vào ô <b>Câu hỏi/Tiêu đề</b>.<br>② Điền 4 đáp án vào ô A, B, C, D.<br>③ Chọn đáp án đúng ở ô <b>Đáp án đúng</b>.<br>④ (Tùy chọn) Dán link ảnh minh họa.<br>⑤ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI bên dưới để sinh đề tự động, sau đó dán kết quả vào ô bóc tách!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) trắc nghiệm 4 đáp án về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung câu hỏi]\nA. [Đáp án 1]\nB. [Đáp án 2]\nC. [Đáp án 3]\nD. [Đáp án 4]\nĐáp án: [A/B/C/D]" + baseImgPrompt;
                 document.getElementById('mc_tf_rows').style.display = 'block';
@@ -707,6 +730,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 document.getElementById('cd_row').style.display = 'flex'; 
                 document.getElementById('q1_correct').innerHTML = '<option value="0">Đáp án A</option><option value="1">Đáp án B</option><option value="2">Đáp án C</option><option value="3">Đáp án D</option>';
             } else if (type === 'true_false') {
+                if (canAutoFillTitle) qTextBox.value = "Nhận định sau đúng hay sai?\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Đúng/Sai.<br>① Nhập một <b>mệnh đề khẳng định</b> vào ô Câu hỏi (Ví dụ: <i>Mặt Trời mọc ở hướng Tây.</i>).<br>② Chọn đáp án đúng là <b>Đúng</b> hoặc <b>Sai</b>.<br>③ (Tùy chọn) Dán link ảnh minh họa.<br>④ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để tạo mệnh đề nhanh hơn!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) dạng Đúng/Sai về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung mệnh đề khẳng định]\nĐáp án: [Đúng hoặc Sai]" + baseImgPrompt;
                 document.getElementById('mc_tf_rows').style.display = 'block';
@@ -716,30 +740,36 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 document.getElementById('cd_row').style.display = 'none'; 
                 document.getElementById('q1_correct').innerHTML = '<option value="0">Đáp án A (Đúng)</option><option value="1">Đáp án B (Sai)</option>';
             } else if (type === 'fill_blank') {
+                if (canAutoFillTitle) qTextBox.value = "Điền từ thích hợp vào chỗ trống:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Điền từ.<br>① Nhập câu hỏi vào ô Câu hỏi (Ví dụ: <i>Thủ đô của Việt Nam là thành phố nào?</i>).<br>② Nhập từ/cụm từ đúng vào ô <b>Đáp án chuẩn</b> (ngắn gọn, 1–5 từ).<br>③ (Tùy chọn) Dán link ảnh minh họa.<br>④ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để sinh câu hỏi đục lỗ!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) dạng Điền từ vào chỗ trống về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung câu hỏi]\nĐáp án: [Từ khóa ngắn gọn cần điền]" + baseImgPrompt;
                 document.getElementById('fill_blank_row').style.display = 'block';
                 document.getElementById('general_images_row').style.display = 'block';
             } else if (type === 'drag_drop') {
+                if (canAutoFillTitle) qTextBox.value = "Sắp xếp theo đúng thứ tự:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Sắp xếp quy trình.<br>① Nhập câu lệnh yêu cầu vào ô Câu hỏi (Ví dụ: <i>Sắp xếp các bước rửa tay đúng thứ tự:</i>).<br>② Nhập các từ/cụm từ theo <b>thứ tự đúng</b>, cách nhau bằng <b>dấu phẩy</b> vào ô Đáp án (Ví dụ: <i>Làm ướt tay, Xoa xà phòng, Chà tay, Xả nước</i>).<br>③ (Tùy chọn) Dán link ảnh.<br>④ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để sinh quy trình tự động!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) yêu cầu sắp xếp thứ tự/quy trình về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Yêu cầu sắp xếp]\nThứ tự: [Các từ khóa đã sắp xếp đúng, cách nhau bằng dấu phẩy]" + baseImgPrompt;
                 document.getElementById('drag_drop_row').style.display = 'block';
                 document.getElementById('general_images_row').style.display = 'block';
             } else if (type === 'drag_classify') {
+                if (canAutoFillTitle) qTextBox.value = "Sắp xếp vào nhóm phù hợp:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Phân loại vào nhóm.<br>① Nhập câu lệnh vào ô Câu hỏi (Ví dụ: <i>Phân loại các động vật sau vào nhóm đúng:</i>).<br>② Ở phần Nhóm phân loại: Bấm <b>+ Thêm nhóm</b>, nhập <b>Tên nhóm</b> (Ví dụ: <i>Động vật có vú</i>), rồi nhập các từ trong nhóm đó cách nhau bằng <b>dấu phẩy</b>.<br>③ Lặp lại bước ② cho tất cả các nhóm.<br>④ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để phân loại tự động!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy tạo bài tập ([SỐ LƯỢNG] câu) phân loại (chia làm nhiều nhóm) về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Tiêu đề yêu cầu bài tập]\n[Tên Nhóm 1]: [Từ khóa 1, Từ khóa 2...]\n[Tên Nhóm 2]: [Từ khóa 3, Từ khóa 4...]" + baseImgPrompt;
                 document.getElementById('drag_classify_row').style.display = 'block';
                 document.getElementById('general_images_row').style.display = 'block';
             } else if (type === 'drag_text') {
+                if (canAutoFillTitle) qTextBox.value = "Chọn từ phù hợp để hoàn chỉnh nội dung:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Kéo từ vào đoạn văn.<br>① Nhập tiêu đề yêu cầu vào ô Câu hỏi (Ví dụ: <i>Hoàn thành đoạn văn sau:</i>).<br>② Nhập đoạn văn vào ô Nội dung đoạn văn. Bao các từ cần ẩn trong <b>dấu ngoặc vuông [ ]</b> (Ví dụ: <i>Cây quang hợp nhờ [Ánh sáng]</i>).<br>③ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để sinh đoạn văn đục lỗ sẵn!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy viết bài tập ([SỐ LƯỢNG] câu) đoạn văn đục lỗ về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "YÊU CẦU ĐẶC BIỆT: Trong đoạn văn, hãy giấu các từ khóa quan trọng bằng cách bọc chúng trong dấu ngoặc vuông [...]. (Ví dụ: Nước ta hình chữ [S]).\n\nCẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Tiêu đề bài tập]\n[Nội dung đoạn văn đã bọc dấu ngoặc vuông]" + baseImgPrompt;
                 document.getElementById('drag_text_row').style.display = 'block';
                 document.getElementById('general_images_row').style.display = 'block';
             } else if (type === 'drag_image') {
+                if (canAutoFillTitle) qTextBox.value = "Nhấp vào vị trí đúng:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn:</b> Chấm tọa độ. Dùng AI sinh ra cấu trúc và các nhãn dán, sau đó bạn dán link ảnh nền vào và tự click chuột để chấm tọa độ nhé!";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) dạng Kéo thả nhãn dán vào Ảnh/Sơ đồ về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung yêu cầu bài tập]\nẢnh nền: [Mời bạn dán link ảnh nền vào đây]\nNhãn dán: [Từ khóa 1, Từ khóa 2, Từ khóa 3...]";
                 document.getElementById('drag_image_row').style.display = 'block';
             } else if (type === 'image_match') {
+                if (canAutoFillTitle) qTextBox.value = "Ghép từ với hình ảnh phù hợp:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn:</b> Ghép tranh. Dùng lệnh AI bên dưới để sinh ra cấu trúc, sau đó bạn tự dán link ảnh vào các vị trí đánh dấu nhé!";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) dạng Ghép từ vào tranh về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung yêu cầu bài tập]\nẢnh 1: [Mời bạn dán link ảnh 1 vào đây]\nĐáp án 1: [Từ khóa tương ứng ảnh 1]\nẢnh 2: [Mời bạn dán link ảnh 2 vào đây]\nĐáp án 2: [Từ khóa tương ứng ảnh 2]";
                 document.getElementById('image_match_row').style.display = 'block';
@@ -1563,6 +1593,9 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             document.getElementById('roomInfo').style.display = 'block'; 
             document.getElementById('pinDisplay').innerText = pin; 
 
+            // TỰ ĐỘNG ẨN BẢNG LƯU Ý ĐỂ RỘNG MÀN HÌNH
+            if(document.getElementById('serverNotice')) document.getElementById('serverNotice').style.display = 'none';
+
             // TẠO VÀ HIỂN THỊ MÃ QR CODE
             const studentUrl = `https://gameshow-thay-phuc1.onrender.com/?pin=${pin}`;
             document.getElementById('qrCodeImg').src = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(studentUrl)}`;
@@ -1578,12 +1611,20 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
         document.getElementById('btnBackToDashboard').addEventListener('click', () => {
             document.getElementById('roomInfo').style.display = 'none';
             document.getElementById('quizCreator').style.display = 'block';
+
+            // HIỆN LẠI BẢNG LƯU Ý KHI VỀ TRANG CHỦ
+            if(document.getElementById('serverNotice')) document.getElementById('serverNotice').style.display = 'block';
+
             loadQuizBank(); // Gọi lại hàm này để Kho đề tự động hiện ra
         });
 
         socket.on('showQuestion', (questionData) => {
             isTickPlaying = false; tickSound.pause(); tickSound.currentTime = 0;
             document.getElementById('gameScreen').style.display = 'block';
+
+            // ĐẢM BẢO BẢNG LƯU Ý LUÔN ẨN KHI ĐANG THI
+            if(document.getElementById('serverNotice')) document.getElementById('serverNotice').style.display = 'none';
+
             document.getElementById('questionText').innerText = questionData.question;
             const imgContainer = document.getElementById('questionImagesContainer');
             imgContainer.innerHTML = ''; 
