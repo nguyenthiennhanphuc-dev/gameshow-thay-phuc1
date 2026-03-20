@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>App Thi Trực Tiếp</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        h1 { color: #4CAF50; }
+    </style>
+</head>
+<body>
+    <h1>Chào mừng đến với Trắc nghiệm Tương tác!</h1>
+    <p>Hãy mở cửa sổ Terminal trong VS Code để xem phép màu.</p>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        // Lệnh này kết nối giao diện này với Server của bạn
+        const socket = io();
+
+        socket.on('connect', () => {
+            console.log('Đã kết nối thành công với server!');
+        });
+    </script>
+</body>
+</html>

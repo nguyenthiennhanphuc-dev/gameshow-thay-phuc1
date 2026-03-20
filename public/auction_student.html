@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Học Sinh - Đấu Giá Sự Thật</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Nunito', sans-serif; text-align: center; background: #1a252f; color: white; margin: 0; padding: 0; overflow-x: hidden; }
+        .card { background: white; color: #333; max-width: 100% !important; width: 100%; margin: 0 !important; border-radius: 0 !important; min-height: 100vh; padding: 25px 30px; box-sizing: border-box; box-shadow: 0 10px 20px rgba(0,0,0,0.5); display: flex; flex-direction: column; justify-content: center; }
+        button { padding: 15px; font-size: 20px; font-weight: 900; cursor: pointer; border: none; border-radius: 10px; color: white; width: 100%; transition: 0.2s; box-shadow: 0 4px 6px rgba(0,0,0,0.2); }
+        button:active { transform: scale(0.95); }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 2px solid #ccc; border-radius: 10px; font-size: 18px; box-sizing: border-box; font-family: 'Nunito'; text-align: center; font-weight: bold; }
+        
+        #balanceDisplay { font-size: 35px; color: #27ae60; font-weight: 900; background: #e8f8f5; padding: 10px; border-radius: 15px; border: 2px solid #2ecc71; margin-bottom: 20px;}
+        #statementDisplay { font-size: 20px; color: #2c3e50; font-weight: bold; background: #ecf0f1; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #3498db; text-align: left; word-wrap: break-word;}
+        #highestBidDisplay { font-size: 22px; color: #e74c3c; font-weight: bold; margin-bottom: 15px; background: #fadbd8; padding: 10px; border-radius: 8px;}
+        
+        .waiting-text { color: #f39c12; font-size: 20px; font-weight: bold; font-style: italic; margin-top: 20px; animation: blink 1.5s infinite; }
+        @keyframes blink { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+
+        /* CSS cho phần hiển thị câu hỏi của Người thắng */
+        #winnerQuestionArea { display: none; background: #fffde7; padding: 20px; border-radius: 15px; border: 3px solid #f1c40f; margin-top: 15px; text-align: left; }
+        .answer-opt { background: #3498db; color: white; padding: 10px; margin: 5px 0; border-radius: 8px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h1 style="color: #f1c40f; margin-top: 10px;">🔨 SÀN ĐẤU GIÁ 🔨</h1>
+
+    <div id="loginArea" class="card">
+        <h2 style="color: #2980b9;">Tham gia Sàn đấu</h2>
+        <input type="number" id="pinInput" placeholder="Nhập Mã Phòng (PIN)">
+        <input type="text" id="nameInput" placeholder="Tên Nhóm / Tên của bạn">
+        <button id="btnJoin" style="background: #27ae60; margin-top: 15px;">🚀 VÀO PHÒNG</button>
+    </div>
+
+    <div id="gameArea" class="card" style="display: none;">
+        <h3>Tài sản của bạn:</h3>
+        <div id="balanceDisplay">0 $</div>
+
+        <div id="waitingArea">
+            <div id="waitText" class="waiting-text">⏳ Đang chờ Host đưa vật phẩm lên sàn...</div>
+        </div>
+
+        <div id="biddingArea" style="display: none;">
+            <div id="bidTitle" style="font-size: 16px; color: #7f8c8d; font-weight: bold; margin-bottom: 5px;">Món hàng đang đấu giá:</div>
+            <div id="statementDisplay">???</div>
+            
+            <div id="highestBidDisplay">Giá cao nhất hiện tại: <span id="currentHighest">0</span>$</div>
+            
+            <div id="bidControls">
+                <input type="number" id="bidAmount" placeholder="Nhập số tiền muốn mua...">
+                <button id="btnBid" style="background: #e67e22; margin-top: 10px; font-size: 24px;">💰 CHỐT GIÁ!</button>
+            </div>
+        </div>
+
+        <div id="winnerQuestionArea">
+            <h2 style="color: #d35400; text-align: center; margin-top: 0;">🎉 BẠN ĐÃ MUA THÀNH CÔNG!</h2>
+            <p style="color: #e74c3c; font-weight: bold; text-align: center;">Hãy đọc to đáp án cho Giáo viên nghe nhé!</p>
+            <div id="winQText" style="font-size: 20px; color: #2c3e50; font-weight: bold; margin-bottom: 15px;"></div>
+            <div id="winQImages" style="text-align: center; margin-bottom: 15px;"></div>
+            <div id="winQAnswers"></div>
+        </div>
+    </div>
+
+    <div id="resultOverlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 999; flex-direction: column; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+        <h1 id="resultTitle" style="font-size: 40px; margin-bottom: 10px;"></h1>
+        <p id="resultMsg" style="font-size: 24px; font-weight: bold; line-height: 1.5; color: white;"></p>
+        <button onclick="document.getElementById('resultOverlay').style.display='none'" style="background: #3498db; width: auto; padding: 10px 40px; margin-top: 30px; font-size: 22px;">Đã hiểu</button>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let myBalance = 0;
+
+        function buildFullQuestionHTML(qData) {
+            let html = `<h3 style="color:#2c3e50; font-size: 32px; margin-top:0; margin-bottom: 15px; line-height: 1.4; padding: 0 10px;">${qData.question}</h3>`;
+            
+            let imgs = qData.images || [];
+            let caps = qData.captions || [];
+            if(imgs.length === 0 && qData.mainImage) imgs = [qData.mainImage];
+
+            if (imgs.length > 0) {
+                let gridCols = imgs.length === 1 ? '1fr' : '1fr 1fr';
+                let imgMaxHeight = imgs.length > 2 ? '18vh' : '28vh';
+                html += `<div style="display: grid; grid-template-columns: ${gridCols}; gap: 10px; justify-content: center; margin: 0 auto 15px auto; width: 95%;">`;
+                imgs.forEach((url, i) => {
+                    html += `<div style="background: #f4f6f7; border-radius: 10px; overflow: hidden; border: 2px solid #bdc3c7; display: flex; flex-direction: column;">
+                                <img src="${url}" style="width: 100%; height: ${imgMaxHeight}; object-fit: contain; background: #fff;">`;
+                    if (caps[i]) { html += `<div style="padding: 6px; font-weight: bold; color: #1565C0; font-size: 18px;">${caps[i]}</div>`; }
+                    html += `</div>`;
+                });
+                html += `</div>`;
+            }
+            // LƯU Ý: Không render đáp án ở đây — đáp án được xử lý riêng bằng <button> bên ngoài
+            return html;
+        }
+        let currentPin = '';
+
+        document.getElementById('btnJoin').onclick = () => {
+            currentPin = document.getElementById('pinInput').value.trim();
+            const name = document.getElementById('nameInput').value.trim();
+            if (!currentPin || !name) { alert('Vui lòng nhập đủ thông tin!'); return; }
+            socket.emit('auc_joinRoom', { pin: currentPin, name: name });
+        };
+
+        socket.on('auc_error', (msg) => { alert(msg); });
+
+        socket.on('auc_joinSuccess', (data) => {
+            myBalance = data.balance;
+            document.getElementById('balanceDisplay').innerText = myBalance + ' $';
+            document.getElementById('loginArea').style.display = 'none';
+            document.getElementById('gameArea').style.display = 'block';
+        });
+
+        // -----------------------------------------------------
+        // CHẾ ĐỘ 1: NHẬP TAY SỰ THẬT
+        // -----------------------------------------------------
+        socket.on('auc_itemStarted', (data) => {
+            resetBiddingUI("📢 Lời nhận định:", data.statement);
+        });
+
+        // -----------------------------------------------------
+        // CHẾ ĐỘ 2: ĐẤU GIÁ CÂU HỎI TỪ KHO ĐỀ
+        // -----------------------------------------------------
+        socket.on('auc_questionBiddingStarted', (data) => {
+            // Lấy đúng gói dữ liệu questionData từ Server gửi xuống
+            const qData = data.questionData; 
+
+            let typeName = "Câu hỏi";
+            if(qData.type === 'multiple_choice') typeName = "Trắc nghiệm";
+            if(qData.type === 'drag_drop') typeName = "Sắp xếp thứ tự";
+            if(qData.type === 'image_match') typeName = "Ghép tranh";
+            if(qData.type === 'drag_classify') typeName = "Phân loại vào nhóm";
+
+            // Tạo nhãn loại câu hỏi
+            let typeHtml = `<div style="color: #d35400; margin-bottom: 10px; font-size: 22px;"><b>Loại câu:</b> ${typeName}</div>`;
+            
+            // Gọi hàm dùng chung để tự động render câu hỏi và hình ảnh siêu to khổng lồ
+            let displayHtml = typeHtml + buildFullQuestionHTML(qData);
+
+            resetBiddingUI("🎁 MÓN HÀNG LÊN SÀN:", displayHtml);
+        });
+ 
+
+        socket.on('auc_waitingForWinner', (data) => {
+            // Khi chốt giá, tất cả học sinh sẽ thấy màn hình chờ
+            document.getElementById('biddingArea').style.display = 'none';
+            document.getElementById('waitingArea').style.display = 'block';
+            document.getElementById('winnerQuestionArea').style.display = 'none';
+            document.getElementById('waitText').innerHTML = `🎙️ Nhóm <b>[${data.winnerName}]</b> đã mua được quyền trả lời!<br><br><span style="color:#bdc3c7; font-size:16px;">(Đang chờ giáo viên chấm điểm...)</span>`;
+        });
+
+        // DÀNH RIÊNG CHO NGƯỜI THẮNG: Hiển thị full câu hỏi
+        socket.on('auc_winnerProvideAnswer', (questionData) => {
+            document.getElementById('waitingArea').style.display = 'none';
+            document.getElementById('winnerQuestionArea').style.display = 'block';
+            
+            // Hiển thị câu hỏi + ảnh bằng hàm dùng chung (to rõ ràng)
+            document.getElementById('winQText').innerHTML = buildFullQuestionHTML(questionData);
+            document.getElementById('winQImages').style.display = 'none'; // Ảnh đã được xử lý trong buildFullQuestionHTML
+
+            // Xử lý đáp án: các đáp án là <button> để bấm được (giữ nguyên logic onclick)
+            const ansCont = document.getElementById('winQAnswers'); ansCont.innerHTML = '';
+            if (questionData.type === 'multiple_choice' || questionData.type === 'true_false') {
+                const colors = ['#e74c3c', '#3498db', '#f1c40f', '#2ecc71'];
+                (questionData.answers || []).forEach((ans, i) => {
+                    const btn = document.createElement('button');
+                    btn.className = 'answer-opt';
+                    btn.innerText = ans;
+                    btn.style.width = '100%';
+                    btn.style.marginBottom = '15px';
+                    btn.style.padding = '20px'; // Giảm padding
+                    btn.style.fontSize = '26px'; // Giảm font chữ nút bấm
+                    btn.style.borderRadius = '12px';
+                    btn.style.fontWeight = 'bold';
+                    btn.style.background = colors[i % 4];
+                    btn.style.boxShadow = '0 4px 6px rgba(0,0,0,0.2)';
+                    btn.onclick = () => {
+                        // Xác định học sinh bấm Đúng hay Sai
+                        const isCorrect = (i === questionData.correctIndex);
+                        if(confirm(`Chốt đáp án: "${ans}"\nBạn có chắc chắn không?`)) {
+                            socket.emit('auc_submitWinnerAnswerByStudent', { pin: currentPin, isCorrect: isCorrect });
+                            ansCont.innerHTML = "<h3 style='color:#27ae60; background:#e8f8f5; padding:20px; border-radius:10px;'>Đã chốt đáp án! Hãy nhìn lên màn hình của Giáo viên để xem kết quả!</h3>";
+                        }
+                    };
+                    ansCont.appendChild(btn);
+                });
+            } else {
+                ansCont.innerHTML = "<i style='color:#7f8c8d;'>Câu hỏi này cần nhập liệu. Hãy thảo luận và đọc to đáp án cho Giáo viên nghe để thầy cô bấm chấm điểm nhé!</i>";
+            }
+        });
+
+        // -----------------------------------------------------
+        // DÙNG CHUNG CẢ 2 CHẾ ĐỘ
+        // -----------------------------------------------------
+        function resetBiddingUI(title, contentHTML) {
+            document.getElementById('waitingArea').style.display = 'none';
+            document.getElementById('winnerQuestionArea').style.display = 'none';
+            document.getElementById('biddingArea').style.display = 'block';
+            document.getElementById('bidControls').style.display = 'block';
+            
+            document.getElementById('bidTitle').innerText = title;
+            document.getElementById('statementDisplay').innerHTML = contentHTML;
+            document.getElementById('currentHighest').innerText = "0";
+            document.getElementById('bidAmount').value = '';
+        }
+
+        document.getElementById('btnBid').onclick = () => {
+            const amount = parseInt(document.getElementById('bidAmount').value);
+            const currentHighest = parseInt(document.getElementById('currentHighest').innerText);
+            
+            if (!amount || isNaN(amount)) { alert("Vui lòng nhập số tiền!"); return; }
+            if (amount <= currentHighest) { alert("Bạn phải ra giá CAO HƠN giá hiện tại!"); return; }
+            if (amount > myBalance) { alert("Bạn không đủ tiền để ra mức giá này!"); return; }
+
+            socket.emit('auc_placeBid', { pin: currentPin, amount: amount });
+            document.getElementById('bidAmount').value = ''; // Xóa ô nhập sau khi chốt
+        };
+
+        socket.on('auc_newHighestBid', (data) => {
+            document.getElementById('currentHighest').innerText = data.amount;
+        });
+
+        socket.on('auc_itemEnded', handleResult);
+        socket.on('auc_questionEnded', handleResult);
+
+        function handleResult(data) {
+            document.getElementById('biddingArea').style.display = 'none';
+            document.getElementById('winnerQuestionArea').style.display = 'none';
+            document.getElementById('waitingArea').style.display = 'block';
+            document.getElementById('waitText').innerHTML = "⏳ Đang chờ Host đưa vật phẩm tiếp theo lên sàn...";
+            
+            // Cập nhật lại số dư mới từ server
+            if (data.players[socket.id]) {
+                myBalance = data.players[socket.id].balance;
+                document.getElementById('balanceDisplay').innerText = myBalance + ' $';
+            }
+
+            // Hiển thị kết quả ván đấu
+            const overlay = document.getElementById('resultOverlay');
+            const title = document.getElementById('resultTitle');
+            const msg = document.getElementById('resultMsg');
+            
+            overlay.style.display = 'flex';
+            msg.innerText = data.resultMsg;
+
+            if (data.resultMsg.includes('SỰ THẬT') || data.resultMsg.includes('XUẤT SẮC')) {
+                title.innerText = '✅ CHÍNH XÁC!'; title.style.color = '#2ecc71';
+            } else if (data.resultMsg.includes('CÚ LỪA') || data.resultMsg.includes('RẤT TIẾC')) {
+                title.innerText = '❌ SAI LẦM!'; title.style.color = '#e74c3c';
+            } else {
+                title.innerText = '⏳ BỎ QUA'; title.style.color = '#f1c40f';
+            }
+        }
+    </script>
+</body>
+</html>
