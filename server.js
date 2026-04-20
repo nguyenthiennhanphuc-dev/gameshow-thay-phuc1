@@ -27,14 +27,14 @@ app.get('/daugia', (req, res) => {
 
 const BASE_URL = 'https://appthitructiep-default-rtdb.asia-southeast1.firebasedatabase.app';
 
-const rooms = {}; 
+const rooms = {};
 
 const defaultQuizData = [
     {
         type: 'multiple_choice',
         question: "Trong JavaScript, từ khóa nào dùng để khai báo biến có thể thay đổi giá trị?",
         answers: ["A. const", "B. let", "C. static", "D. final"],
-        correctIndex: 1 
+        correctIndex: 1
     },
     {
         type: 'multiple_choice',
@@ -49,16 +49,16 @@ app.post('/api/auth', async (req, res) => {
     try {
         const { username, password, action } = req.body;
         if (!username || !password) return res.status(400).json({ error: "Thiếu thông tin!" });
-        
+
         const safeUser = encodeURIComponent(username).replace(/[\.\$\[\]\#\/]/g, '_');
         const userUrl = `${BASE_URL}/users/${safeUser}.json`;
-        
+
         const response = await axios.get(userUrl);
         const userData = response.data;
 
         if (action === 'register') {
             if (userData) return res.status(400).json({ error: "Tên đăng nhập đã có người sử dụng!" });
-            await axios.put(userUrl, { password: password }); 
+            await axios.put(userUrl, { password: password });
             return res.json({ success: true, username: safeUser });
         } else if (action === 'login') {
             if (!userData || userData.password !== password) return res.status(401).json({ error: "Sai tên đăng nhập hoặc mật khẩu!" });
@@ -72,7 +72,7 @@ app.get('/api/quizzes', async (req, res) => {
     try {
         const username = req.query.username;
         if (!username) return res.status(401).json({ error: "Chưa đăng nhập!" });
-        
+
         const response = await axios.get(`${BASE_URL}/quizzes/${username}.json`);
         const data = response.data;
         const quizzes = [];
@@ -86,7 +86,7 @@ app.post('/api/quizzes', async (req, res) => {
     try {
         const { name, data, timeSetting, username } = req.body;
         if (!username) return res.status(401).json({ error: "Chưa đăng nhập!" });
-        
+
         const safeName = encodeURIComponent(name).replace(/[\.\$\[\]\#\/]/g, '_');
         await axios.put(`${BASE_URL}/quizzes/${username}/${safeName}.json`, { name, data, timeSetting });
         res.json({ success: true });
@@ -98,7 +98,7 @@ app.delete('/api/quizzes/:name', async (req, res) => {
     try {
         const username = req.query.username;
         if (!username) return res.status(401).json({ error: "Chưa đăng nhập!" });
-        
+
         const safeName = encodeURIComponent(req.params.name).replace(/[\.\$\[\]\#\/]/g, '_');
         await axios.delete(`${BASE_URL}/quizzes/${username}/${safeName}.json`);
         res.json({ success: true });
@@ -106,9 +106,9 @@ app.delete('/api/quizzes/:name', async (req, res) => {
 });
 
 function startTimer(pin) {
-    if (rooms[pin].timer) clearInterval(rooms[pin].timer); 
-    
-    rooms[pin].timeLeft = rooms[pin].timeSetting || 20; 
+    if (rooms[pin].timer) clearInterval(rooms[pin].timer);
+
+    rooms[pin].timeLeft = rooms[pin].timeSetting || 20;
     io.to(pin).emit('timerTick', rooms[pin].timeLeft);
 
     rooms[pin].timer = setInterval(() => {
@@ -116,9 +116,9 @@ function startTimer(pin) {
         io.to(pin).emit('timerTick', rooms[pin].timeLeft);
 
         if (rooms[pin].timeLeft <= 0) {
-            clearInterval(rooms[pin].timer); 
-            io.to(pin).emit('timeUp'); 
-            
+            clearInterval(rooms[pin].timer);
+            io.to(pin).emit('timeUp');
+
             // Gán "Hết giờ" cho học sinh chưa trả lời
             const currentQuestionIndex = rooms[pin].currentQuestionIndex;
             for (const sid in rooms[pin].playerNames) {
@@ -128,11 +128,21 @@ function startTimer(pin) {
                 }
             }
 
-            io.to(rooms[pin].hostId).emit('updateStats', {
-                answerCounts: rooms[pin].answerCounts,
-                answeredCount: rooms[pin].answeredCount,
-                totalPlayers: rooms[pin].players.length,
-                forceShowNext: true 
+            const dataRoom = rooms[pin];
+            const currentQ = dataRoom.quizData[dataRoom.currentQuestionIndex];
+            const currentLeaderboard = [];
+            for (const socketId in dataRoom.scores) {
+                currentLeaderboard.push({ name: dataRoom.playerNames[socketId] || "Ẩn danh", score: dataRoom.scores[socketId] });
+            }
+            currentLeaderboard.sort((a, b) => b.score - a.score);
+
+            io.to(dataRoom.hostId).emit('updateStats', { 
+                answerCounts: dataRoom.answerCounts, 
+                answeredCount: dataRoom.answeredCount,
+                totalPlayers: dataRoom.players.length,
+                correctIndex: currentQ.correctIndex, 
+                forceShowNext: true,
+                currentLeaderboard: currentLeaderboard 
             });
             console.log(`⏰ Hết giờ tại phòng ${pin}`);
         }
@@ -146,13 +156,13 @@ io.on('connection', (socket) => {
 
     socket.on('startGame', (pin) => {
         if (rooms[pin] && rooms[pin].hostId === socket.id) {
-            rooms[pin].currentQuestionIndex = 0; 
-            rooms[pin].answerCounts = [0, 0, 0, 0]; 
-            rooms[pin].answeredCount = 0; 
+            rooms[pin].currentQuestionIndex = 0;
+            rooms[pin].answerCounts = [0, 0, 0, 0];
+            rooms[pin].answeredCount = 0;
 
             const firstQuestion = rooms[pin].quizData[0];
-            socket.emit('showQuestion', firstQuestion);
-            
+            socket.emit('showQuestion', { ...firstQuestion, idx: 0, total: rooms[pin].quizData.length });
+
             let payload = { type: firstQuestion.type || 'multiple_choice' };
             if (firstQuestion.type === 'drag_drop') {
                 payload.shuffledAnswers = [...firstQuestion.answers].sort(() => Math.random() - 0.5);
@@ -174,47 +184,71 @@ io.on('connection', (socket) => {
                 payload.dropZones = (firstQuestion.dropZones || []).map(z => ({ x: z.x, y: z.y }));
                 payload.wordBank = allAnswers.sort(() => Math.random() - 0.5);
             }
+
+            payload.answers = firstQuestion.answers || []; // Vòng 8: Gửi mảng nội dung đáp án
+
+            // Luôn gửi text và image nếu Giáo viên có tích chọn hiển thị
+            if (rooms[pin].showStudentQuestion) {
+                payload.questionText = firstQuestion.question || null;
+
+                // Gửi mảng ảnh minh họa (nếu có)
+                if (firstQuestion.images && firstQuestion.images.length > 0) {
+                    payload.questionImages = firstQuestion.images.map(img => img.url ? img.url : img);
+                } else if (firstQuestion.mainImage) {
+                    payload.questionImages = [firstQuestion.mainImage];
+                } else {
+                    payload.questionImages = null;
+                }
+            } else {
+                payload.questionText = null;
+                payload.questionImages = null;
+            }
             socket.to(pin).emit('showAnswerButtons', payload);
-            
+
             startTimer(pin);
-            
+
             console.log(`▶️ Trò chơi bắt đầu tại phòng ${pin}`);
         }
     });
 
     socket.on('createRoom', () => {
-        const pin = Math.floor(100000 + Math.random() * 900000).toString(); 
-        rooms[pin] = { 
-            hostId: socket.id, 
-            players: [],       
+        const pin = Math.floor(100000 + Math.random() * 900000).toString();
+        rooms[pin] = {
+            hostId: socket.id,
+            players: [],
             scores: {},
             playerNames: {},
             studentHistory: {},
-            timeLeft: 0, 
+            timeLeft: 0,
             timer: null,
-            quizData: defaultQuizData, 
-            timeSetting: 20
+            quizData: defaultQuizData,
+            timeSetting: 20,
+            showStudentQuestion: true
         };
-        socket.join(pin); 
-        socket.emit('roomCreated', pin); 
+        socket.join(pin);
+        socket.emit('roomCreated', pin);
         console.log(`🏫 Phòng mới tạo (Đề mặc định): ${pin}`);
     });
 
     socket.on('createRoomWithData', (data) => {
-        const pin = Math.floor(100000 + Math.random() * 900000).toString(); 
-        rooms[pin] = { 
-            hostId: socket.id, 
-            players: [],       
+        const pin = Math.floor(100000 + Math.random() * 900000).toString();
+        rooms[pin] = {
+            hostId: socket.id,
+            players: [],
             scores: {},
             playerNames: {},
             studentHistory: {},
-            timeLeft: 0, 
+            timeLeft: 0,
             timer: null,
-            quizData: data.quizData,       
-            timeSetting: data.timeSetting  
+            quizData: data.quizData,
+            timeSetting: data.timeSetting,
+            themeName: data.themeName || '',
+            bgColor: data.bgColor || '#fff9c4',
+            bgImage: data.bgImage || '',
+            showStudentQuestion: data.showStudentQuestion || false
         };
-        socket.join(pin); 
-        socket.emit('roomCreated', pin); 
+        socket.join(pin);
+        socket.emit('roomCreated', pin);
         console.log(`🏫 Phòng mới tạo (Đề tự soạn - ${data.quizData.length} câu - ${data.timeSetting}s): ${pin}`);
     });
 
@@ -229,7 +263,11 @@ io.on('connection', (socket) => {
             rooms[pin].playerNames[socket.id] = name;
             rooms[pin].studentHistory[socket.id] = [];
 
-            socket.emit('joinSuccess');
+            socket.emit('joinSuccess', {
+                themeName: rooms[pin].themeName || '',
+                bgColor: rooms[pin].bgColor || '#fff9c4',
+                bgImage: rooms[pin].bgImage || ''
+            });
             io.to(rooms[pin].hostId).emit('playerJoined', name);
             console.log(`👨‍🎓 ${name} đã tham gia phòng ${pin}`);
         } else {
@@ -239,10 +277,10 @@ io.on('connection', (socket) => {
 
     socket.on('submitAnswer', (data) => {
         const pin = data.pin;
-        const answerIndex = data.answerIndex; 
-        const answerText = data.answerText;   
-        const answerArray = data.answerArray; 
-        const answerObj = data.answerObj; 
+        const answerIndex = data.answerIndex;
+        const answerText = data.answerText;
+        const answerArray = data.answerArray;
+        const answerObj = data.answerObj;
 
         if (rooms[pin] && rooms[pin].scores !== undefined && rooms[pin].timeLeft > 0) {
             const currentQIndex = rooms[pin].currentQuestionIndex;
@@ -255,7 +293,7 @@ io.on('connection', (socket) => {
             else historyAnswerStr = currentQ.answers[answerIndex] || "Không rõ";
 
             // Lưu vết
-            if(!rooms[pin].studentHistory[socket.id]) rooms[pin].studentHistory[socket.id] = [];
+            if (!rooms[pin].studentHistory[socket.id]) rooms[pin].studentHistory[socket.id] = [];
             rooms[pin].studentHistory[socket.id][currentQIndex] = historyAnswerStr;
 
             let isCorrect = false;
@@ -263,25 +301,25 @@ io.on('connection', (socket) => {
             if (currentQ.type === 'fill_blank') {
                 const studentAns = (answerText || "").toString().trim().toLowerCase();
                 const correctAns = (currentQ.correctText || "").toString().trim().toLowerCase();
-                
+
                 if (studentAns === correctAns && studentAns !== "") {
                     isCorrect = true;
                 }
-            } else if (currentQ.type === 'drag_drop') { 
+            } else if (currentQ.type === 'drag_drop') {
                 const studentAns = JSON.stringify(answerArray || []);
                 const correctAns = JSON.stringify(currentQ.answers || []);
-                
+
                 if (studentAns === correctAns && answerArray && answerArray.length > 0) {
                     isCorrect = true;
                 }
             } else if (currentQ.type === 'image_match') {
                 const studentAnsArray = (answerArray || []).map(str => (str || "").toString().trim().toLowerCase());
                 const correctAnsArray = (currentQ.correctAnswers || []).map(str => (str || "").toString().trim().toLowerCase());
-                
+
                 if (studentAnsArray.length > 0 && studentAnsArray.length === correctAnsArray.length) {
                     let allMatch = true;
-                    for(let i = 0; i < studentAnsArray.length; i++) {
-                        if(studentAnsArray[i] !== correctAnsArray[i]) {
+                    for (let i = 0; i < studentAnsArray.length; i++) {
+                        if (studentAnsArray[i] !== correctAnsArray[i]) {
                             allMatch = false;
                             break;
                         }
@@ -295,12 +333,12 @@ io.on('connection', (socket) => {
                 let isAllCorrect = true;
                 let totalCorrectItems = 0;
                 let totalStudentItems = 0;
-                
+
                 for (let cat of (currentQ.categories || [])) {
                     let catName = cat.name;
                     let correctItems = (cat.items || []).map(i => i.toString().toLowerCase().trim()).sort();
                     let studentItems = (studentAnsObj[catName] || []).map(i => i.toString().toLowerCase().trim()).sort();
-                    
+
                     totalCorrectItems += correctItems.length;
                     totalStudentItems += studentItems.length;
 
@@ -309,18 +347,18 @@ io.on('connection', (socket) => {
                         break;
                     }
                 }
-                
+
                 if (isAllCorrect && totalCorrectItems > 0 && totalCorrectItems === totalStudentItems) {
                     isCorrect = true;
                 }
             } else if (currentQ.type === 'drag_text') {
                 const studentAnsArray = (answerArray || []).map(str => (str || "").toString().trim().toLowerCase());
                 const correctAnsArray = (currentQ.correctAnswers || []).map(str => (str || "").toString().trim().toLowerCase());
-                
+
                 if (studentAnsArray.length > 0 && studentAnsArray.length === correctAnsArray.length) {
                     let allMatch = true;
-                    for(let i = 0; i < studentAnsArray.length; i++) {
-                        if(studentAnsArray[i] !== correctAnsArray[i]) {
+                    for (let i = 0; i < studentAnsArray.length; i++) {
+                        if (studentAnsArray[i] !== correctAnsArray[i]) {
                             allMatch = false;
                             break;
                         }
@@ -332,11 +370,11 @@ io.on('connection', (socket) => {
             } else if (currentQ.type === 'drag_image') {
                 const studentAnsArray = (answerArray || []).map(str => (str || "").toString().trim().toLowerCase());
                 const correctAnsArray = (currentQ.dropZones || []).map(z => (z.answer || "").toString().trim().toLowerCase());
-                
+
                 if (studentAnsArray.length > 0 && studentAnsArray.length === correctAnsArray.length) {
                     let allMatch = true;
-                    for(let i = 0; i < studentAnsArray.length; i++) {
-                        if(studentAnsArray[i] !== correctAnsArray[i]) {
+                    for (let i = 0; i < studentAnsArray.length; i++) {
+                        if (studentAnsArray[i] !== correctAnsArray[i]) {
                             allMatch = false;
                             break;
                         }
@@ -352,17 +390,17 @@ io.on('connection', (socket) => {
             }
 
             if (isCorrect) {
-                const timeBonus = rooms[pin].timeLeft * 10; 
+                const timeBonus = rooms[pin].timeLeft * 10;
                 rooms[pin].scores[socket.id] += (1000 + timeBonus);
             }
 
-            if(!rooms[pin].answerCounts) rooms[pin].answerCounts = [0,0,0,0];
-            if(!rooms[pin].answeredCount) rooms[pin].answeredCount = 0;
+            if (!rooms[pin].answerCounts) rooms[pin].answerCounts = [0, 0, 0, 0];
+            if (!rooms[pin].answeredCount) rooms[pin].answeredCount = 0;
 
             if (currentQ.type !== 'fill_blank' && currentQ.type !== 'drag_drop' && currentQ.type !== 'image_match' && currentQ.type !== 'drag_classify' && currentQ.type !== 'drag_text' && currentQ.type !== 'drag_image') {
                 rooms[pin].answerCounts[answerIndex]++;
             }
-            
+
             rooms[pin].answeredCount++;
 
             socket.emit('answerResult', {
@@ -370,13 +408,24 @@ io.on('connection', (socket) => {
                 score: rooms[pin].scores[socket.id]
             });
 
+            const currentLeaderboard = [];
+            for (const socketId in rooms[pin].scores) {
+                currentLeaderboard.push({
+                    name: rooms[pin].playerNames[socketId] || "Ẩn danh",
+                    score: rooms[pin].scores[socketId]
+                });
+            }
+            currentLeaderboard.sort((a, b) => b.score - a.score);
+
             io.to(rooms[pin].hostId).emit('updateStats', {
                 answerCounts: rooms[pin].answerCounts,
                 answeredCount: rooms[pin].answeredCount,
                 totalPlayers: rooms[pin].players.length,
-                forceShowNext: false
+                correctIndex: currentQ.correctIndex,
+                forceShowNext: rooms[pin].answeredCount === rooms[pin].players.length,
+                currentLeaderboard: currentLeaderboard
             });
-            
+
             if (rooms[pin].answeredCount === rooms[pin].players.length) {
                 clearInterval(rooms[pin].timer);
             }
@@ -387,16 +436,16 @@ io.on('connection', (socket) => {
 
     socket.on('nextQuestion', (pin) => {
         if (rooms[pin] && rooms[pin].hostId === socket.id) {
-            rooms[pin].currentQuestionIndex++; 
-            
+            rooms[pin].currentQuestionIndex++;
+
             if (rooms[pin].currentQuestionIndex < rooms[pin].quizData.length) {
                 rooms[pin].answerCounts = [0, 0, 0, 0];
                 rooms[pin].answeredCount = 0;
 
+                // Mới V9: Gắn index để check câu cuối
                 const nextQ = rooms[pin].quizData[rooms[pin].currentQuestionIndex];
-                
-                socket.emit('showQuestion', nextQ);
-                
+                socket.emit('showQuestion', { ...nextQ, idx: rooms[pin].currentQuestionIndex, total: rooms[pin].quizData.length });
+
                 let payload = { type: nextQ.type || 'multiple_choice' };
                 if (nextQ.type === 'drag_drop') {
                     payload.shuffledAnswers = [...nextQ.answers].sort(() => Math.random() - 0.5);
@@ -416,13 +465,32 @@ io.on('connection', (socket) => {
                     payload.dropZones = (nextQ.dropZones || []).map(z => ({ x: z.x, y: z.y }));
                     payload.wordBank = allAnswers.sort(() => Math.random() - 0.5);
                 }
+
+                payload.answers = nextQ.answers || []; // Vòng 8: Gửi mảng nội dung đáp án
+
+                // Luôn gửi text và image nếu Giáo viên có tích chọn hiển thị
+                if (rooms[pin].showStudentQuestion) {
+                    payload.questionText = nextQ.question || null;
+
+                    // Gửi mảng ảnh minh họa (nếu có)
+                    if (nextQ.images && nextQ.images.length > 0) {
+                        payload.questionImages = nextQ.images.map(img => img.url ? img.url : img);
+                    } else if (nextQ.mainImage) {
+                        payload.questionImages = [nextQ.mainImage];
+                    } else {
+                        payload.questionImages = null;
+                    }
+                } else {
+                    payload.questionText = null;
+                    payload.questionImages = null;
+                }
                 socket.to(pin).emit('showAnswerButtons', payload);
-                
+
                 startTimer(pin);
-                
+
                 console.log(`⏭️ Chuyển sang câu hỏi ${rooms[pin].currentQuestionIndex + 1} tại phòng ${pin}`);
             } else {
-                if (rooms[pin].timer) clearInterval(rooms[pin].timer); 
+                if (rooms[pin].timer) clearInterval(rooms[pin].timer);
 
                 const leaderboard = [];
                 for (const socketId in rooms[pin].scores) {
