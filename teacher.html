@@ -27,7 +27,7 @@
         .card { 
             background: white; padding: 40px; border-radius: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
-            max-width: 900px; margin: 0 auto; 
+            max-width: 100%; margin: 0 auto; 
         }
 
         #pinDisplay { font-size: 70px; font-weight: 900; color: #d32f2f; letter-spacing: 5px; margin: 20px 0; }
@@ -93,7 +93,7 @@
             background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;
         }
         .preview-content {
-            background: white; padding: 30px; border-radius: 20px; max-width: 800px; width: 90%;
+            background: white; padding: 30px; border-radius: 20px; max-width: 100%; width: 95%;
             max-height: 90vh; overflow-y: auto; position: relative; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             text-align: left;
         }
@@ -117,8 +117,19 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
+    <div id="landingScreen" style="display: flex; flex-direction: column; justify-content: center; align-items: center; min-height: 100vh; background: linear-gradient(135deg, #1A237E 0%, #3F51B5 100%); color: white; position: absolute; top: 0; left: 0; right: 0; bottom: 0; z-index: 100000; box-sizing: border-box; padding: 20px;">
+        <h1 style="font-size: 5vw; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); margin-bottom: 20px; text-align: center;">Hệ Thống Trắc Nghiệm Tương Tác</h1>
+        <img src="/hero_image.png" style="max-width: 90%; max-height: 50vh; border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6); margin-bottom: 40px; object-fit: cover;" alt="Interactive Classroom">
+        <div style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+            <button onclick="showTutorial()" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); border: 2px solid white; font-size: 24px; padding: 15px 40px; border-radius: 30px; color: white; cursor: pointer; transition: 0.3s;">📖 Hướng dẫn dùng</button>
+            <button onclick="enterDashboard()" style="background: #FF4081; font-size: 24px; padding: 15px 40px; border-radius: 30px; border: none; color: white; box-shadow: 0 4px 15px rgba(255,64,129,0.4); cursor: pointer; transition: 0.3s;">🚀 Bắt đầu chơi</button>
+            <button onclick="enterDashboard()" style="background: #00BCD4; font-size: 24px; padding: 15px 40px; border-radius: 30px; border: none; color: white; box-shadow: 0 4px 15px rgba(0,188,212,0.4); cursor: pointer; transition: 0.3s;">⚙️ Cài đặt câu hỏi</button>
+        </div>
+    </div>
+
+    <div id="dashboardWrapper" style="display: none; width: 100%;">
     <h1 id="mainDashboardHeader">🌟 Bảng điều khiển của Giáo viên 🌟</h1>
-    <div id="serverNotice" style="background-color: #FFF9C4; color: #E65100; padding: 15px; border-radius: 10px; border: 2px dashed #F57F17; margin: 15px auto; max-width: 900px; font-size: 18px; font-weight: bold; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+    <div id="serverNotice" style="background-color: #FFF9C4; color: #E65100; padding: 15px; border-radius: 10px; border: 2px dashed #F57F17; margin: 15px auto; max-width: 100%; font-size: 18px; font-weight: bold; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
         ⚠️ LƯU Ý QUAN TRỌNG TRƯỚC KHI LÊN LỚP:<br>
         <span style="font-size: 16px; font-weight: normal;">Hệ thống đang chạy trên máy chủ đám mây. Nếu không có ai truy cập trong 15 phút, máy chủ sẽ tạm "ngủ".<br>
         👉 <b>Bí quyết:</b> Lần mở trang web đầu tiên của tiết học có thể mất <b>30 - 50 giây</b> để đánh thức máy chủ. Thầy/Cô vui lòng kiên nhẫn đợi một chút, sau khi thức dậy tốc độ sẽ mượt mà ngay lập tức!</span>
@@ -147,36 +158,7 @@
     <div id="quizCreator" class="card" style="display: none;">
         <h2 style="color: #1565C0; font-size: 28px; margin-top: 0;">🛠️ SOẠN ĐỀ THI MỚI</h2>
         
-        <div id="roomSettingsArea" style="background: #E8EAF6; padding: 20px; border-radius: 15px; border: 2px dashed #3F51B5; margin-top: 20px; margin-bottom: 20px; text-align: left;">
-            <h3 style="margin-top: 0; color: #3F51B5; text-align: center;">⚙️ Tùy chỉnh Giao diện Phòng thi (Giống Kahoot)</h3>
-            <div class="input-group">
-                <label>📌 Tên chủ đề cuộc thi:</label>
-                <input type="text" id="roomTheme" placeholder="VD: Ôn tập Giữa kỳ">
-            </div>
-            <div class="input-group" style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
-                <div style="flex: 1; min-width: 200px;">
-                    <label>🎨 Màu nền phòng thi:</label>
-                    <input type="color" id="roomBgColor" value="#fff9c4" style="width: 100%; height: 45px; border: 2px solid #ccc; border-radius: 10px; cursor: pointer; padding: 3px;">
-                </div>
-                <div style="flex: 2; min-width: 250px;">
-                    <label>🖼️ Link ảnh nền (Tùy chọn):</label>
-                    <select id="presetBgImage" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 10px;" onchange="document.getElementById('roomBgImage').style.display = (this.value === 'custom') ? 'block' : 'none';">
-                        <option value="">Không dùng ảnh</option>
-                        <option value="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1200&q=80">Vũ trụ huyền bí</option>
-                        <option value="https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=1200&q=80">Bầu trời xanh</option>
-                        <option value="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80">Bảng phấn học tập</option>
-                        <option value="custom">Tự dán link ảnh khác...</option>
-                    </select>
-                    <input type="text" id="roomBgImage" placeholder="Dán link ảnh nền vào đây (không bắt buộc)..." style="display: none; padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 100%; font-size: 16px;">
-                </div>
-            </div>
-            <div class="input-group" style="margin-bottom: 0;">
-                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 17px;">
-                    <input type="checkbox" id="showQuestionOnStudent" style="width: 22px; height: 22px; cursor: pointer;">
-                    📖 Hiển thị nội dung câu hỏi và hình ảnh trên màn hình học sinh
-                </label>
-            </div>
-        </div>
+
 
         <div id="uploadSection">
             <h3 style="margin-top: 0;">Cách 1: Tải lên file Excel (.xlsx)</h3>
@@ -413,6 +395,37 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
         <div style="margin: 15px 0;">
             <img id="qrCodeImg" src="" style="border-radius: 15px; border: 5px solid white; box-shadow: 0 5px 15px rgba(0,0,0,0.1); display: none; max-width: 250px;">
         </div>
+
+        <div id="roomSettingsArea" style="background: #E8EAF6; padding: 20px; border-radius: 15px; border: 2px dashed #3F51B5; margin-top: 20px; margin-bottom: 20px; text-align: left;">
+            <h3 style="margin-top: 0; color: #3F51B5; text-align: center;">⚙️ Tùy chỉnh Giao diện Phòng thi (Giống Kahoot)</h3>
+            <div class="input-group">
+                <label>📌 Tên chủ đề cuộc thi:</label>
+                <input type="text" id="roomTheme" placeholder="VD: Ôn tập Giữa kỳ" onchange="updateRoomSettings()">
+            </div>
+            <div class="input-group" style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label>🎨 Màu nền phòng thi:</label>
+                    <input type="color" id="roomBgColor" value="#fff9c4" style="width: 100%; height: 45px; border: 2px solid #ccc; border-radius: 10px; cursor: pointer; padding: 3px;" oninput="updateRoomSettings()">
+                </div>
+                <div style="flex: 2; min-width: 250px;">
+                    <label>🖼️ Link ảnh nền (Tùy chọn):</label>
+                    <select id="presetBgImage" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 10px;" onchange="document.getElementById('roomBgImage').style.display = (this.value === 'custom') ? 'block' : 'none'; updateRoomSettings();">
+                        <option value="">Không dùng ảnh</option>
+                        <option value="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1200&q=80">Vũ trụ huyền bí</option>
+                        <option value="https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=1200&q=80">Bầu trời xanh</option>
+                        <option value="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80">Bảng phấn học tập</option>
+                        <option value="custom">Tự dán link ảnh khác...</option>
+                    </select>
+                    <input type="text" id="roomBgImage" placeholder="Dán link ảnh nền vào đây (không bắt buộc)..." style="display: none; padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 100%; font-size: 16px;" onchange="updateRoomSettings()">
+                </div>
+            </div>
+            <div class="input-group" style="margin-bottom: 0;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 17px;">
+                    <input type="checkbox" id="showQuestionOnStudent" style="width: 22px; height: 22px; cursor: pointer;" checked onchange="updateRoomSettings()">
+                    📖 Hiển thị nội dung câu hỏi và hình ảnh trên màn hình học sinh
+                </label>
+            </div>
+        </div>
         <h3 style="color: #555;">Sĩ số lớp: <span id="playerCount" style="color: #2196F3; font-size: 30px;">0</span></h3>
         <ul id="studentList"></ul>
         <button id="btnStartGame" style="display: none; background-color: #E21B3C; font-size: 24px; margin-top: 30px; width: 100%;">Bắt đầu Trò chơi!</button>
@@ -450,7 +463,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
         <h3 id="dragTextNotice" style="display: none; color: #283593; font-size: 26px; padding: 20px; background: #E8EAF6; border-radius: 15px;">📝 Học sinh đang gắp từ để điền vào đoạn văn...</h3>
         <h3 id="dragImageNotice" style="display: none; color: #1B5E20; font-size: 26px; padding: 20px; background: #C8E6C9; border-radius: 15px;">📍 Học sinh đang kéo thả nhãn dán vào hình ảnh...</h3>
         
-        <div id="teacherCorrectAnswerBox" style="display: none; background: #FFF9C4; border: 3px dashed #F57F17; border-radius: 15px; padding: 20px; margin: 20px auto; max-width: 900px; color: #E65100; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"></div>
+        <div id="teacherCorrectAnswerBox" style="display: none; background: #FFF9C4; border: 3px dashed #F57F17; border-radius: 15px; padding: 20px; margin: 20px auto; max-width: 100%; color: #E65100; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"></div>
 
         <button id="btnNextQuestion" style="background-color: #9C27B0; font-size: 18px; margin: 0; padding: 10px 20px; display: none; position: fixed; top: 170px; right: 30px; z-index: 9999; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Câu tiếp theo ⏭️</button>
     </div>
@@ -464,6 +477,25 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+
+        function updateRoomSettings() {
+            if (!currentPin) return;
+            const roomTheme = document.getElementById('roomTheme').value.trim();
+            const roomBgColor = document.getElementById('roomBgColor').value;
+            let roomBgImage = document.getElementById('presetBgImage').value;
+            if (roomBgImage === 'custom') {
+                roomBgImage = document.getElementById('roomBgImage').value.trim();
+            }
+            const showQuestionOnStudent = document.getElementById('showQuestionOnStudent').checked;
+
+            socket.emit('updateRoomSettings', {
+                pin: currentPin,
+                themeName: roomTheme,
+                bgColor: roomBgColor,
+                bgImage: roomBgImage,
+                showStudentQuestion: showQuestionOnStudent
+            });
+        }
         let count = 0;
         let currentUser = localStorage.getItem('teacherUsername') || null;
         let currentPin = '';
@@ -2072,12 +2104,39 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             if (currentUser) {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('quizCreator').style.display = 'block';
-                const h1 = document.querySelector('h1');
+                const h1 = document.querySelector('h1#mainDashboardHeader');
                 if(h1) h1.innerHTML = `🌟 Bảng điều khiển của Giáo viên: <span style="color:#D32F2F;">${decodeURIComponent(currentUser)}</span> 🌟 <br><button onclick="window.open('/auction_teacher.html', '_blank')" style="background:#9C27B0; font-size:16px; padding:8px 20px; border-radius: 8px; color: white; border: none; cursor: pointer; margin-top: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.2);">🔨 Mở chế độ Đấu Giá Sự Thật</button> <button onclick="logout()" style="background:#757575; font-size:14px; padding:5px 15px; vertical-align: middle; border-radius: 8px; color: white; border: none; cursor: pointer; margin-left: 15px; margin-top: 15px;">Đăng xuất</button>`;
                 renderDraftList(); loadQuizBank();
             }
         }
         checkLoginState();
+
+        function enterDashboard() {
+            document.getElementById('landingScreen').style.display = 'none';
+            document.getElementById('dashboardWrapper').style.display = 'block';
+        }
+
+        function showTutorial() {
+            document.getElementById('tutorialModal').style.display = 'flex';
+        }
     </script>
+    </div> <!-- Close dashboardWrapper -->
+
+    <div id="tutorialModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.8); z-index: 10000; justify-content: center; align-items: center; text-align: left;">
+        <div style="background: white; padding: 40px; border-radius: 20px; max-width: 800px; width: 90%; position: relative;">
+            <span onclick="document.getElementById('tutorialModal').style.display='none'" style="position: absolute; top: 15px; right: 20px; font-size: 35px; cursor: pointer; color: #aaa;">&times;</span>
+            <h2 style="color: #1565C0; margin-top: 0; border-bottom: 2px solid #eee; padding-bottom: 10px;">📖 Hướng dẫn sử dụng hệ thống</h2>
+            <div style="font-size: 18px; line-height: 1.8; color: #333; margin-top: 20px;">
+                <p><b>Bước 1:</b> Nhấn <b>"Cài đặt câu hỏi"</b> để đăng nhập vào kho đề cá nhân.</p>
+                <p><b>Bước 2:</b> Bắt đầu <b>soạn đề thi mới</b> thủ công hoặc <b>tải lên từ file Excel</b>. Bạn có thể chèn các dạng câu hỏi phong phú như trắc nghiệm, kéo thả từ, điền khuyết, ghép tranh, phân loại nhóm,...</p>
+                <p><b>Bước 3:</b> Sau khi soạn xong, lưu lại vào kho hoặc bấm <b>"Tạo Phòng Thi Ngay"</b>.</p>
+                <p><b>Bước 4:</b> Tại phòng chờ (có QR Code), yêu cầu học sinh quét mã hoặc truy cập link nhập mã PIN để vào lớp.</p>
+                <p><b>Bước 5:</b> Giáo viên nhấn <b>"Bắt đầu trò chơi"</b> và quản lý tiến độ làm bài của cả lớp thông qua hệ thống thống kê trực tiếp trên màn hình.</p>
+                <div style="text-align: center; margin-top: 30px;">
+                    <button onclick="document.getElementById('tutorialModal').style.display='none'" style="background: #4CAF50; font-size: 20px; padding: 10px 30px; border-radius: 12px; color: white; border: none; cursor: pointer;">Đã hiểu!</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

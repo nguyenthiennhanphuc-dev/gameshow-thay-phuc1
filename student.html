@@ -27,7 +27,7 @@
         .card {
             background: white; padding: 30px; border-radius: 20px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.08); 
-            max-width: 600px; margin: 0 auto;
+            max-width: 100%; margin: 0 auto;
         }
 
         h1 { color: #1565C0; margin-top: 0; }
@@ -51,7 +51,7 @@
         #miniScore { position: absolute; top: 15px; right: 20px; font-size: 20px; font-weight: 900; background: #fff; padding: 8px 20px; border-radius: 30px; border: 3px solid #ff9800; color: #ff9800; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
         #miniTimer { position: absolute; top: 15px; left: 20px; font-size: 20px; font-weight: 900; background: #fff; padding: 8px 20px; border-radius: 30px; border: 3px solid #E53935; color: #E53935; display: none; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
 
-        .answerGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 600px; margin: 0 auto; padding: 0 20px; }
+        .answerGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; max-width: 100%; margin: 0 auto; padding: 0 20px; }
         .answerBtn { 
             height: 150px; font-size: 36px; color: white; font-weight: 900; 
             border: none; border-radius: 15px; cursor: pointer; 
@@ -65,19 +65,19 @@
         .btn-c { background-color: #D89E00; }
         .btn-d { background-color: #26890C; }
 
-        #resultScreen { display: none; padding: 40px 20px; margin: 30px auto; border-radius: 20px; color: white; max-width: 600px; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        #finalScreen { display: none; padding: 40px; margin: 30px auto; border-radius: 20px; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.15); max-width: 600px; }
+        #resultScreen { display: none; padding: 40px 20px; margin: 30px auto; border-radius: 20px; color: white; max-width: 100%; box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
+        #finalScreen { display: none; padding: 40px; margin: 30px auto; border-radius: 20px; background-color: #ffffff; box-shadow: 0 10px 30px rgba(0,0,0,0.15); max-width: 100%; }
         
         #fillBlankContainer { display: none; margin-top: 20px; padding: 0 20px; }
         #fillBlankInput { 
-            width: 100%; max-width: 600px; padding: 20px; font-size: 24px; 
+            width: 100%; max-width: 100%; padding: 20px; font-size: 24px; 
             border-radius: 15px; border: 3px solid #2196F3; font-weight: bold;
         }
-        #btnSubmitFillBlank { background-color: #4CAF50; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 600px;}
+        #btnSubmitFillBlank { background-color: #4CAF50; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 100%;}
 
         /* CSS Sắp xếp thứ tự */
         #dragDropContainer { display: none; margin-top: 20px; padding: 0 20px; }
-        #sortableList { list-style-type: none; padding: 0; margin: 0; max-width: 600px; margin: 0 auto; counter-reset: slot-counter; }
+        #sortableList { list-style-type: none; padding: 0; margin: 0; max-width: 100%; margin: 0 auto; counter-reset: slot-counter; }
         .sortable-item { 
             background-color: #fff; border: 2px solid #FF9800; color: #E65100;
             padding: 18px 15px 18px 65px; margin-bottom: 15px; border-radius: 12px; font-size: 22px; font-weight: bold;
@@ -92,19 +92,19 @@
         }
         .sortable-item:active { cursor: grabbing; box-shadow: 0 8px 15px rgba(0,0,0,0.2); transform: scale(1.02); z-index: 10; }
         .sortable-ghost { opacity: 0.3; background-color: #FFF3E0; border-style: dashed; } 
-        #btnSubmitDragDrop { background-color: #FF9800; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 600px;}
+        #btnSubmitDragDrop { background-color: #FF9800; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 100%;}
 
         /* CSS Ghép tranh */
         #imageMatchContainer { display: none; margin-top: 20px; padding: 0 20px; }
-        .image-match-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 800px; margin: 0 auto; }
+        .image-match-grid { display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; max-width: 100%; margin: 0 auto; }
         .im-student-card { background: white; padding: 15px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 45%; min-width: 200px; }
         .im-student-card img { width: 100%; height: 160px; object-fit: contain; border-radius: 10px; margin-bottom: 10px; background: #f9f9f9; }
         .im-student-input { width: 100%; padding: 15px; font-size: 18px; border: 2px solid #CE93D8; border-radius: 8px; box-sizing: border-box; text-align: center; font-family: 'Nunito', sans-serif; font-weight: bold;}
         .im-student-input:focus { border-color: #9C27B0; outline: none; }
-        #btnSubmitImageMatch { background-color: #AB47BC; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 600px; }
+        #btnSubmitImageMatch { background-color: #AB47BC; font-size: 24px; margin-top: 20px; padding: 15px; width: 100%; max-width: 100%; }
 
         /* CSS Phân loại nhóm */
-        #classifyContainer { display: none; margin-top: 20px; padding: 0 10px; max-width: 600px; margin-left: auto; margin-right: auto;}
+        #classifyContainer { display: none; margin-top: 20px; padding: 0 10px; max-width: 100%; margin-left: auto; margin-right: auto;}
         .word-bank { 
             min-height: 80px; background: #FFF3E0; border: 2px dashed #FF9800; border-radius: 12px; 
             padding: 15px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; align-items: center;
@@ -129,7 +129,7 @@
         #btnSubmitClassify { background-color: #00897B; font-size: 24px; margin-top: 10px; padding: 15px; width: 100%; }
 
         /* CSS Kéo thả đoạn văn */
-        #dragTextContainer { display: none; margin-top: 20px; padding: 0 15px; max-width: 700px; margin-left: auto; margin-right: auto; }
+        #dragTextContainer { display: none; margin-top: 20px; padding: 0 15px; max-width: 100%; margin-left: auto; margin-right: auto; }
         .text-passage {
             background: #E8EAF6; padding: 25px; border-radius: 15px; border: 2px solid #3F51B5;
             font-size: 22px; color: #1A237E; line-height: 2; text-align: left; margin-bottom: 20px;
@@ -144,7 +144,7 @@
         #btnSubmitDragText { background-color: #3F51B5; font-size: 24px; margin-top: 10px; padding: 15px; width: 100%; }
 
         /* THÊM MỚI: CSS Kéo thả vào Hình ảnh (Chấm tọa độ) */
-        #dragImageContainer { display: none; margin-top: 20px; padding: 0 15px; max-width: 800px; margin-left: auto; margin-right: auto; }
+        #dragImageContainer { display: none; margin-top: 20px; padding: 0 15px; max-width: 100%; margin-left: auto; margin-right: auto; }
         .di-wrapper { 
             position: relative; display: inline-block; max-width: 100%; 
             border: 2px solid #4CAF50; border-radius: 8px; overflow: hidden; background: #fff;
@@ -342,6 +342,27 @@
                     themeDisplay.innerText = '🎯 Chủ đề: ' + roomData.themeName;
                     themeDisplay.style.display = 'block';
                 }
+            }
+        });
+
+        socket.on('updateTheme', (roomData) => {
+            if (roomData.bgColor) {
+                document.body.style.backgroundColor = roomData.bgColor;
+            }
+            if (roomData.bgImage) {
+                document.body.style.backgroundImage = `url('${roomData.bgImage}')`;
+                document.body.style.backgroundSize = 'cover';
+                document.body.style.backgroundPosition = 'center';
+                document.body.style.backgroundRepeat = 'no-repeat';
+            } else {
+                document.body.style.backgroundImage = 'none';
+            }
+            if (roomData.themeName) {
+                const themeDisplay = document.getElementById('studentThemeName');
+                themeDisplay.innerText = '🎯 Chủ đề: ' + roomData.themeName;
+                themeDisplay.style.display = 'block';
+            } else {
+                document.getElementById('studentThemeName').style.display = 'none';
             }
         });
 
