@@ -34,13 +34,13 @@
         #studentList { list-style-type: none; padding: 0; font-size: 24px; display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-top: 20px; }
         #studentList li { background: #E3F2FD; padding: 10px 20px; border-radius: 30px; font-weight: bold; color: #1565C0; }
         
-        #questionText { font-size: 28px; font-weight: 900; color: #333; margin-bottom: 10px; white-space: pre-wrap; }
+        #questionText { font-size: 28px; font-weight: 900; color: #333; margin-bottom: 10px; white-space: pre-wrap; width: 100%; display: flex; align-items: center; justify-content: center; text-align: center; flex: 1; transition: all 0.3s ease; box-sizing: border-box; padding: 2vh 160px; }
         
-        #timerDisplay { font-size: 36px; font-weight: 900; color: #E53935; background: #FFEBEE; display: inline-block; padding: 5px 20px; border-radius: 50px; margin-bottom: 10px; border: 3px solid #E53935;}
+        #timerDisplay { position: fixed; top: 25px; right: 30px; left: auto; width: 120px; height: 120px; font-size: 50px; color: #E53935; background: #FFEBEE; display: flex; align-items: center; justify-content: center; font-weight: 900; box-shadow: 0 10px 25px rgba(0,0,0,0.4); border-radius: 50px; border: 3px solid #E53935; z-index: 1000; margin: 0; padding: 0;}
         
-        #answerList { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; list-style: none; padding: 0; margin-top: 10px; }
+        #answerList { order: 3; width: 100%; max-width: 1800px; flex: 1; min-height: 25vh; max-height: 40vh; gap: 20px; margin-bottom: 20px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; list-style: none; padding: 0; margin-top: 10px; }
         #answerList li { 
-            padding: 15px; font-size: 22px; font-weight: bold; color: white; 
+            padding: 10px; font-size: 30px; font-weight: bold; color: white; 
             border-radius: 12px; display: flex; align-items: center; justify-content: center;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); word-break: break-word;
         }
@@ -62,7 +62,7 @@
         .correct-select { padding: 12px; border-radius: 8px; font-size: 16px; border: 2px solid #ccc; font-family: 'Nunito'; width: 100%; cursor: pointer;}
         #uploadSection { padding: 30px; border: 3px dashed #64B5F6; border-radius: 15px; background-color: #F8BBD0; background: rgba(100, 181, 246, 0.1); margin-bottom: 30px;}
 
-        .bar-container { display: flex; justify-content: center; gap: 30px; align-items: flex-end; height: 200px; margin-top: 30px;}
+        .bar-container { display: flex; justify-content: center; gap: 30px; align-items: flex-end; height: 20vh; max-height: 180px; margin-top: auto; margin-bottom: auto;}
         .bar-wrap { display: flex; flex-direction: column; align-items: center; width: 80px;}
         .bar { width: 100%; border-radius: 10px 10px 0 0; transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1); height: 0px; box-shadow: 0 -4px 10px rgba(0,0,0,0.1); }
         .bar-label { font-weight: bold; margin-top: 10px; font-size: 20px;}
@@ -117,7 +117,12 @@
     <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
 </head>
 <body>
-    <h1>🌟 Bảng điều khiển của Giáo viên 🌟</h1>
+    <h1 id="mainDashboardHeader">🌟 Bảng điều khiển của Giáo viên 🌟</h1>
+    <div id="serverNotice" style="background-color: #FFF9C4; color: #E65100; padding: 15px; border-radius: 10px; border: 2px dashed #F57F17; margin: 15px auto; max-width: 900px; font-size: 18px; font-weight: bold; text-align: left; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        ⚠️ LƯU Ý QUAN TRỌNG TRƯỚC KHI LÊN LỚP:<br>
+        <span style="font-size: 16px; font-weight: normal;">Hệ thống đang chạy trên máy chủ đám mây. Nếu không có ai truy cập trong 15 phút, máy chủ sẽ tạm "ngủ".<br>
+        👉 <b>Bí quyết:</b> Lần mở trang web đầu tiên của tiết học có thể mất <b>30 - 50 giây</b> để đánh thức máy chủ. Thầy/Cô vui lòng kiên nhẫn đợi một chút, sau khi thức dậy tốc độ sẽ mượt mà ngay lập tức!</span>
+    </div>
     
     <div id="loginScreen" class="card" style="margin-top: 20px; border: 3px solid #2196F3;">
         <h2 style="color: #1565C0; margin-top: 0;">🔐 Đăng nhập hệ thống</h2>
@@ -142,6 +147,37 @@
     <div id="quizCreator" class="card" style="display: none;">
         <h2 style="color: #1565C0; font-size: 28px; margin-top: 0;">🛠️ SOẠN ĐỀ THI MỚI</h2>
         
+        <div id="roomSettingsArea" style="background: #E8EAF6; padding: 20px; border-radius: 15px; border: 2px dashed #3F51B5; margin-top: 20px; margin-bottom: 20px; text-align: left;">
+            <h3 style="margin-top: 0; color: #3F51B5; text-align: center;">⚙️ Tùy chỉnh Giao diện Phòng thi (Giống Kahoot)</h3>
+            <div class="input-group">
+                <label>📌 Tên chủ đề cuộc thi:</label>
+                <input type="text" id="roomTheme" placeholder="VD: Ôn tập Giữa kỳ">
+            </div>
+            <div class="input-group" style="display: flex; gap: 20px; align-items: flex-start; flex-wrap: wrap;">
+                <div style="flex: 1; min-width: 200px;">
+                    <label>🎨 Màu nền phòng thi:</label>
+                    <input type="color" id="roomBgColor" value="#fff9c4" style="width: 100%; height: 45px; border: 2px solid #ccc; border-radius: 10px; cursor: pointer; padding: 3px;">
+                </div>
+                <div style="flex: 2; min-width: 250px;">
+                    <label>🖼️ Link ảnh nền (Tùy chọn):</label>
+                    <select id="presetBgImage" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px; margin-bottom: 10px;" onchange="document.getElementById('roomBgImage').style.display = (this.value === 'custom') ? 'block' : 'none';">
+                        <option value="">Không dùng ảnh</option>
+                        <option value="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=1200&q=80">Vũ trụ huyền bí</option>
+                        <option value="https://images.unsplash.com/photo-1513002749550-c59d786b8e6c?auto=format&fit=crop&w=1200&q=80">Bầu trời xanh</option>
+                        <option value="https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80">Bảng phấn học tập</option>
+                        <option value="custom">Tự dán link ảnh khác...</option>
+                    </select>
+                    <input type="text" id="roomBgImage" placeholder="Dán link ảnh nền vào đây (không bắt buộc)..." style="display: none; padding: 10px; border-radius: 8px; border: 1px solid #ccc; width: 100%; font-size: 16px;">
+                </div>
+            </div>
+            <div class="input-group" style="margin-bottom: 0;">
+                <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 17px;">
+                    <input type="checkbox" id="showQuestionOnStudent" style="width: 22px; height: 22px; cursor: pointer;">
+                    📖 Hiển thị nội dung câu hỏi và hình ảnh trên màn hình học sinh
+                </label>
+            </div>
+        </div>
+
         <div id="uploadSection">
             <h3 style="margin-top: 0;">Cách 1: Tải lên file Excel (.xlsx)</h3>
             <button id="btnDownloadTemplate" style="background-color: #4CAF50;">⬇️ Tải File Mẫu</button><br>
@@ -348,6 +384,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             <input type="number" id="timeSetting" value="20" min="5" max="120" style="width: 100px; display: inline-block; margin-left: 10px;">
         </div>
 
+
         <div class="action-buttons">
             <button id="btnCreateRoomFromData" style="background-color: #FF8F00; font-size: 20px; display: none; flex: 2;">🚀 TẠO PHÒNG THI NGAY</button>
             <button id="btnSaveToBank" style="background-color: #00897B; font-size: 20px; display: none; flex: 1;">💾 LƯU VÀO KHO ĐỀ</button>
@@ -382,11 +419,28 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
         <button id="btnBackToDashboard" style="background-color: #757575; font-size: 20px; margin-top: 15px; width: 100%;">🔙 Trở về Bảng Điều Khiển</button>
     </div>
 
-    <div id="gameScreen" class="card" style="display: none; max-width: 1200px;">
+    <div id="gameScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; box-sizing: border-box; padding: 20px 4vw; background: linear-gradient(135deg, #f0f8ff 0%, #e6f2ff 100%); z-index: 100; flex-direction: column; justify-content: space-between; align-items: center; overflow-y: auto;">
+        <audio id="countdownSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto" loop></audio>
         <div id="timerDisplay">⏳ <span id="timeText">20</span></div>
         <h2 id="questionText">Câu hỏi sẽ hiện ở đây</h2>
-        <div id="questionImagesContainer" style="display: flex; flex-wrap: wrap; justify-content: center; gap: 15px; margin-bottom: 20px;"></div>
+        <div id="questionImagesContainer" style="display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 15px; margin-bottom: 20px; max-height: 35vh; overflow-y: hidden; overflow-x: auto; padding-bottom: 10px; width: 100%;"></div>
         <div id="questionDetailedContent" style="margin-bottom: 20px; font-size: 22px; color: #1565C0; background: #fff; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); display: none; text-align: left;"></div>
+        <div id="statsArea" style="display: none; width: 100%; margin-bottom: 5px; flex-shrink: 0;">
+            <h3 style="font-size: 18px; color: #555; margin-bottom: 5px;">Thống kê: <span id="answeredRatio">0/0</span> đã trả lời</h3>
+            <div id="chartContainer" style="display: none; width: 100%; max-width: 1400px; margin: 5px auto; flex-direction: row; justify-content: center; align-items: stretch; gap: 15px; order: 2; z-index: 10;">
+                <div id="statsWrapper" style="flex: 1; background: rgba(255,255,255,0.95); padding: 10px; border-radius: 12px; border: 2px solid #2196F3; box-shadow: 0 4px 8px rgba(0,0,0,0.1); display: flex; flex-direction: column; align-items: center;">
+                    <h3 style="margin-top:0; color: #1565C0; font-size: 18px;">Thống kê Đáp án</h3>
+                    <div id="barChart" style="display: flex; gap: 15px; width: 100%; height: 12vh; min-height: 80px; padding-top: 5px; align-items: flex-end; justify-content: center;">
+                        <div class="bar-wrap" id="bar-wrap-A"><div class="bar-count" id="countA">0</div><div class="bar" id="barA" style="background-color: #e21b3c;"></div><div class="bar-label">A</div></div>
+                        <div class="bar-wrap" id="bar-wrap-B"><div class="bar-count" id="countB">0</div><div class="bar" id="barB" style="background-color: #1368ce;"></div><div class="bar-label">B</div></div>
+                        <div class="bar-wrap" id="bar-wrap-C"><div class="bar-count" id="countC">0</div><div class="bar" id="barC" style="background-color: #d89e00;"></div><div class="bar-label">C</div></div>
+                        <div class="bar-wrap" id="bar-wrap-D"><div class="bar-count" id="countD">0</div><div class="bar" id="barD" style="background-color: #26890c;"></div><div class="bar-label">D</div></div>
+                    </div>
+                </div>
+                <div id="miniLeaderboardContainer" style="flex: 1; background: rgba(255,255,255,0.95); padding: 10px 15px; border-radius: 12px; border: 2px solid #4CAF50; box-shadow: 0 4px 8px rgba(0,0,0,0.1); overflow-y: auto;"></div>
+            </div>
+        </div>
+
         <ul id="answerList"></ul>
         
         <h3 id="fillBlankNotice" style="display: none; color: #1565C0; font-size: 26px; padding: 20px; background: #E3F2FD; border-radius: 15px;">✍️ Học sinh đang gõ câu trả lời...</h3>
@@ -398,16 +452,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
         
         <div id="teacherCorrectAnswerBox" style="display: none; background: #FFF9C4; border: 3px dashed #F57F17; border-radius: 15px; padding: 20px; margin: 20px auto; max-width: 900px; color: #E65100; font-size: 24px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);"></div>
 
-        <div id="statsArea" style="display: none;">
-            <h3 style="font-size: 24px; color: #555;">Thống kê: <span id="answeredRatio">0/0</span> đã trả lời</h3>
-            <div class="bar-container" id="chartContainer">
-                <div class="bar-wrap" id="bar-wrap-A"><div class="bar-count" id="countA">0</div><div class="bar" id="barA" style="background-color: #e21b3c;"></div><div class="bar-label">A</div></div>
-                <div class="bar-wrap" id="bar-wrap-B"><div class="bar-count" id="countB">0</div><div class="bar" id="barB" style="background-color: #1368ce;"></div><div class="bar-label">B</div></div>
-                <div class="bar-wrap" id="bar-wrap-C"><div class="bar-count" id="countC">0</div><div class="bar" id="barC" style="background-color: #d89e00;"></div><div class="bar-label">C</div></div>
-                <div class="bar-wrap" id="bar-wrap-D"><div class="bar-count" id="countD">0</div><div class="bar" id="barD" style="background-color: #26890c;"></div><div class="bar-label">D</div></div>
-            </div>
-        </div>
-        <button id="btnNextQuestion" style="background-color: #9C27B0; font-size: 20px; margin-top: 40px; display: none;">Câu tiếp theo ⏭️</button>
+        <button id="btnNextQuestion" style="background-color: #9C27B0; font-size: 18px; margin: 0; padding: 10px 20px; display: none; position: fixed; top: 170px; right: 30px; z-index: 9999; border: 2px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.3);">Câu tiếp theo ⏭️</button>
     </div>
 
     <div id="endScreen" class="card" style="display: none; background: #FFD54F;">
@@ -482,10 +527,8 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
 
             lines.forEach(line => {
                 let lowerLine = line.toLowerCase();
-                // Bắt cả trường hợp AI bôi đậm chữ hoặc tự chèn gạch đầu dòng, hỗ trợ thêm từ khóa 'ảnh nền'
                 if (lowerLine.match(/^\**\s*-?\s*(ảnh|link|image|ảnh nền)\s*\d*\**\s*:/)) {
                     let rawUrl = line.substring(line.indexOf(':') + 1).trim();
-                    
                     let httpMatch = rawUrl.match(/(https?:\/\/[^\s\>\]\)"']+)/);
                     if (httpMatch) {
                         imgLinks.push(httpMatch[1]);
@@ -500,7 +543,6 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 }
             });
 
-            // Chỉ nhồi ảnh vào phần chung nếu KHÔNG phải là 2 dạng đặc thù này
             if (type !== 'image_match' && type !== 'drag_image') {
                 if (imgLinks.length > 0 || imgCaps.length > 0) {
                     const container = document.getElementById('imageFieldsContainer');
@@ -539,7 +581,6 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                     }
                 }
                 document.getElementById('q1_correct').value = correctIdx;
-                document.getElementById('q1_text').value = questionLines.join('\n');
             } 
             else if (type === 'true_false') {
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -551,7 +592,6 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                         questionLines.push(remainingLines[i]);
                     }
                 }
-                document.getElementById('q1_text').value = questionLines.join('\n');
             } 
             else if (type === 'fill_blank') {
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -563,7 +603,6 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                         questionLines.push(remainingLines[i]);
                     }
                 }
-                document.getElementById('q1_text').value = questionLines.join('\n');
             } 
             else if (type === 'drag_drop') {
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -575,14 +614,12 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                         questionLines.push(remainingLines[i]);
                     }
                 }
-                document.getElementById('q1_text').value = questionLines.join('\n');
             } 
             else if (type === 'drag_text') {
                 if (remainingLines.length === 1) {
-                    document.getElementById('q1_text').value = "Hãy kéo thả từ thích hợp vào chỗ trống:";
                     document.getElementById('q1_drag_text_content').value = remainingLines[0];
                 } else {
-                    document.getElementById('q1_text').value = remainingLines[0];
+                    questionLines.push(remainingLines[0]);
                     document.getElementById('q1_drag_text_content').value = remainingLines.slice(1).join('\n');
                 }
             } 
@@ -591,11 +628,9 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 classCont.innerHTML = '';
                 for (let i = 0; i < remainingLines.length; i++) {
                     let line = remainingLines[i];
-                    // ĐÃ SỬA: Thêm chữ 'câu' vào regex để không nhận nhầm Câu hỏi thành Nhóm phân loại
                     if (line.includes(':') && !line.toLowerCase().match(/^\**\s*(câu|tiêu đề)/)) {
                         let parts = line.split(':');
                         let cName = parts[0].replace(/\*\*/g, '').trim();
-                        // Gộp các phần tử phía sau phòng trường hợp nội dung cũng có dấu hai chấm
                         let cItems = parts.slice(1).join(':').replace(/\*\*/g, '').trim();
                         
                         const div = document.createElement('div');
@@ -613,9 +648,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                     }
                 }
                 if (classCont.innerHTML === '') addClassifyGroup();
-                document.getElementById('q1_text').value = questionLines.join('\n');
             }
-            // XỬ LÝ MỚI: Bóc tách Ghép Tranh
             else if (type === 'image_match') {
                 let ansList = [];
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -642,9 +675,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                     matchCont.appendChild(div);
                 }
                 if (matchCont.innerHTML === '') addImageMatchPair();
-                document.getElementById('q1_text').value = questionLines.join('\n');
             }
-            // XỬ LÝ MỚI: Bóc tách Chấm tọa độ
             else if (type === 'drag_image') {
                 let labelList = [];
                 for (let i = 0; i < remainingLines.length; i++) {
@@ -658,21 +689,40 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 }
                 
                 document.getElementById('di_main_image').value = imgLinks[0] || '';
-                document.getElementById('q1_text').value = questionLines.join('\n');
                 
-                // Tự động tạo các điểm neo chờ sẵn (dàn đều theo chiều dọc)
                 dragImageDropZones = [];
                 labelList.forEach((lbl, idx) => {
                     dragImageDropZones.push({ x: 50, y: 10 + (idx * 15), answer: lbl });
                 });
                 
                 if (imgLinks[0]) {
-                    loadDragImagePreview(); // Sẽ hiển thị ảnh và vẽ các điểm dummy vừa tạo lên ảnh
+                    loadDragImagePreview(); 
                 } else {
                     renderDragImageDropZones();
                 }
             }
             
+            // --- XỬ LÝ NỐI TIÊU ĐỀ THÔNG MINH ---
+            let parsedQText = questionLines.join('\n').trim();
+            const qTextBox = document.getElementById('q1_text');
+            const currentTitle = qTextBox.value.trim();
+            const defaultTitles = [
+                "Em hãy chọn đáp án đúng nhất:", "Nhận định sau đúng hay sai?",
+                "Điền từ thích hợp vào chỗ trống:", "Sắp xếp theo đúng thứ tự:",
+                "Sắp xếp vào nhóm phù hợp:", "Chọn từ phù hợp để hoàn chỉnh nội dung:",
+                "Nhấp vào vị trí đúng:", "Ghép từ với hình ảnh phù hợp:"
+            ];
+            
+            if (parsedQText) {
+                // Nếu ô nhập đang chứa đúng tiêu đề mặc định hoặc GV đã viết gì đó, thì nối bóc tách xuống dòng dưới
+                if (currentTitle) {
+                    qTextBox.value = currentTitle + "\n" + parsedQText;
+                } else {
+                    qTextBox.value = parsedQText;
+                }
+            }
+            // ------------------------------------
+
             document.getElementById('smartPasteInput').value = '';
             alert("✅ Bóc tách văn bản thành công! Các ô đã được tự động điền.");
         }
@@ -681,6 +731,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             const type = document.getElementById('q1_type').value;
             const instructionBox = document.getElementById('dynamic_instruction');
             const aiPromptBox = document.getElementById('aiPromptText');
+            const qTextBox = document.getElementById('q1_text'); 
             
             document.getElementById('mc_tf_rows').style.display = 'none';
             document.getElementById('correct_select_row').style.display = 'none';
@@ -697,7 +748,19 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             let multiQPrompt = "LƯU Ý QUAN TRỌNG DÀNH CHO BẠN:\\n1. Phải đánh dấu rõ từng câu (Ví dụ: Câu 1:, Câu 2:).\\n2. Trình bày mỗi thông tin/đáp án ở MỘT DÒNG RIÊNG BIỆT.\\n3. Giữa các câu hỏi phải cách nhau 1 dòng trống.\\n4. ĐỐI VỚI CÔNG THỨC TOÁN/LÝ/HÓA: Bắt buộc viết bằng chuẩn LaTeX và bọc trong cặp dấu $ (Ví dụ: $x^2 + y=1$). Tuyệt đối không bọc ký hiệu A, B, C, D vào trong dấu $\\n\\n";
             let baseImgPrompt = "\\nNếu câu hỏi có hình ảnh minh họa, hãy ghi rõ ở các dòng đáp án của câu hỏi theo đúng định dạng:\\nẢnh 1: [Mời bạn dán link ảnh 1 vào đây]\\nChú thích 1: [Ghi chú 1]\\nẢnh 2: [Mời bạn dán link ảnh 2 vào đây]\\nChú thích 2: [Ghi chú 2]\\n...Nếu không cần ảnh thì TUYỆT ĐỐI không ghi dòng này.";
 
+            // --- BẮT ĐẦU LOGIC ĐIỀN TIÊU ĐỀ THÔNG MINH ---
+            const defaultTitles = [
+                "", "Em hãy chọn đáp án đúng nhất:", "Nhận định sau đúng hay sai?",
+                "Điền từ thích hợp vào chỗ trống:", "Sắp xếp theo đúng thứ tự:",
+                "Sắp xếp vào nhóm phù hợp:", "Chọn từ phù hợp để hoàn chỉnh nội dung:",
+                "Nhấp vào vị trí đúng:", "Ghép từ với hình ảnh phù hợp:"
+            ];
+            const currentText = qTextBox.value.trim();
+            const canAutoFillTitle = defaultTitles.includes(currentText);
+            // --- KẾT THÚC LOGIC ---
+
             if (type === 'multiple_choice') {
+                if (canAutoFillTitle) qTextBox.value = "Em hãy chọn đáp án đúng nhất:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Trắc nghiệm 4 đáp án.<br>① Nhập câu hỏi vào ô <b>Câu hỏi/Tiêu đề</b>.<br>② Điền 4 đáp án vào ô A, B, C, D.<br>③ Chọn đáp án đúng ở ô <b>Đáp án đúng</b>.<br>④ (Tùy chọn) Dán link ảnh minh họa.<br>⑤ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI bên dưới để sinh đề tự động, sau đó dán kết quả vào ô bóc tách!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) trắc nghiệm 4 đáp án về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung câu hỏi]\nA. [Đáp án 1]\nB. [Đáp án 2]\nC. [Đáp án 3]\nD. [Đáp án 4]\nĐáp án: [A/B/C/D]" + baseImgPrompt;
                 document.getElementById('mc_tf_rows').style.display = 'block';
@@ -707,6 +770,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 document.getElementById('cd_row').style.display = 'flex'; 
                 document.getElementById('q1_correct').innerHTML = '<option value="0">Đáp án A</option><option value="1">Đáp án B</option><option value="2">Đáp án C</option><option value="3">Đáp án D</option>';
             } else if (type === 'true_false') {
+                if (canAutoFillTitle) qTextBox.value = "Nhận định sau đúng hay sai?\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Đúng/Sai.<br>① Nhập một <b>mệnh đề khẳng định</b> vào ô Câu hỏi (Ví dụ: <i>Mặt Trời mọc ở hướng Tây.</i>).<br>② Chọn đáp án đúng là <b>Đúng</b> hoặc <b>Sai</b>.<br>③ (Tùy chọn) Dán link ảnh minh họa.<br>④ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để tạo mệnh đề nhanh hơn!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) dạng Đúng/Sai về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung mệnh đề khẳng định]\nĐáp án: [Đúng hoặc Sai]" + baseImgPrompt;
                 document.getElementById('mc_tf_rows').style.display = 'block';
@@ -716,30 +780,36 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 document.getElementById('cd_row').style.display = 'none'; 
                 document.getElementById('q1_correct').innerHTML = '<option value="0">Đáp án A (Đúng)</option><option value="1">Đáp án B (Sai)</option>';
             } else if (type === 'fill_blank') {
+                if (canAutoFillTitle) qTextBox.value = "Điền từ thích hợp vào chỗ trống:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Điền từ.<br>① Nhập câu hỏi vào ô Câu hỏi (Ví dụ: <i>Thủ đô của Việt Nam là thành phố nào?</i>).<br>② Nhập từ/cụm từ đúng vào ô <b>Đáp án chuẩn</b> (ngắn gọn, 1–5 từ).<br>③ (Tùy chọn) Dán link ảnh minh họa.<br>④ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để sinh câu hỏi đục lỗ!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) dạng Điền từ vào chỗ trống về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung câu hỏi]\nĐáp án: [Từ khóa ngắn gọn cần điền]" + baseImgPrompt;
                 document.getElementById('fill_blank_row').style.display = 'block';
                 document.getElementById('general_images_row').style.display = 'block';
             } else if (type === 'drag_drop') {
+                if (canAutoFillTitle) qTextBox.value = "Sắp xếp theo đúng thứ tự:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Sắp xếp quy trình.<br>① Nhập câu lệnh yêu cầu vào ô Câu hỏi (Ví dụ: <i>Sắp xếp các bước rửa tay đúng thứ tự:</i>).<br>② Nhập các từ/cụm từ theo <b>thứ tự đúng</b>, cách nhau bằng <b>dấu phẩy</b> vào ô Đáp án (Ví dụ: <i>Làm ướt tay, Xoa xà phòng, Chà tay, Xả nước</i>).<br>③ (Tùy chọn) Dán link ảnh.<br>④ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để sinh quy trình tự động!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) yêu cầu sắp xếp thứ tự/quy trình về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Yêu cầu sắp xếp]\nThứ tự: [Các từ khóa đã sắp xếp đúng, cách nhau bằng dấu phẩy]" + baseImgPrompt;
                 document.getElementById('drag_drop_row').style.display = 'block';
                 document.getElementById('general_images_row').style.display = 'block';
             } else if (type === 'drag_classify') {
+                if (canAutoFillTitle) qTextBox.value = "Sắp xếp vào nhóm phù hợp:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Phân loại vào nhóm.<br>① Nhập câu lệnh vào ô Câu hỏi (Ví dụ: <i>Phân loại các động vật sau vào nhóm đúng:</i>).<br>② Ở phần Nhóm phân loại: Bấm <b>+ Thêm nhóm</b>, nhập <b>Tên nhóm</b> (Ví dụ: <i>Động vật có vú</i>), rồi nhập các từ trong nhóm đó cách nhau bằng <b>dấu phẩy</b>.<br>③ Lặp lại bước ② cho tất cả các nhóm.<br>④ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để phân loại tự động!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy tạo bài tập ([SỐ LƯỢNG] câu) phân loại (chia làm nhiều nhóm) về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Tiêu đề yêu cầu bài tập]\n[Tên Nhóm 1]: [Từ khóa 1, Từ khóa 2...]\n[Tên Nhóm 2]: [Từ khóa 3, Từ khóa 4...]" + baseImgPrompt;
                 document.getElementById('drag_classify_row').style.display = 'block';
                 document.getElementById('general_images_row').style.display = 'block';
             } else if (type === 'drag_text') {
+                if (canAutoFillTitle) qTextBox.value = "Chọn từ phù hợp để hoàn chỉnh nội dung:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn nhập tay:</b> Câu Kéo từ vào đoạn văn.<br>① Nhập tiêu đề yêu cầu vào ô Câu hỏi (Ví dụ: <i>Hoàn thành đoạn văn sau:</i>).<br>② Nhập đoạn văn vào ô Nội dung đoạn văn. Bao các từ cần ẩn trong <b>dấu ngoặc vuông [ ]</b> (Ví dụ: <i>Cây quang hợp nhờ [Ánh sáng]</i>).<br>③ Bấm <b>Thêm câu hỏi vào đề</b>.<br><br>💻 <i>Hoặc dùng lệnh AI để sinh đoạn văn đục lỗ sẵn!</i>";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy viết bài tập ([SỐ LƯỢNG] câu) đoạn văn đục lỗ về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "YÊU CẦU ĐẶC BIỆT: Trong đoạn văn, hãy giấu các từ khóa quan trọng bằng cách bọc chúng trong dấu ngoặc vuông [...]. (Ví dụ: Nước ta hình chữ [S]).\n\nCẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Tiêu đề bài tập]\n[Nội dung đoạn văn đã bọc dấu ngoặc vuông]" + baseImgPrompt;
                 document.getElementById('drag_text_row').style.display = 'block';
                 document.getElementById('general_images_row').style.display = 'block';
             } else if (type === 'drag_image') {
+                if (canAutoFillTitle) qTextBox.value = "Nhấp vào vị trí đúng:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn:</b> Chấm tọa độ. Dùng AI sinh ra cấu trúc và các nhãn dán, sau đó bạn dán link ảnh nền vào và tự click chuột để chấm tọa độ nhé!";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) dạng Kéo thả nhãn dán vào Ảnh/Sơ đồ về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung yêu cầu bài tập]\nẢnh nền: [Mời bạn dán link ảnh nền vào đây]\nNhãn dán: [Từ khóa 1, Từ khóa 2, Từ khóa 3...]";
                 document.getElementById('drag_image_row').style.display = 'block';
             } else if (type === 'image_match') {
+                if (canAutoFillTitle) qTextBox.value = "Ghép từ với hình ảnh phù hợp:\n";
                 instructionBox.innerHTML = "<b>💡 Hướng dẫn:</b> Ghép tranh. Dùng lệnh AI bên dưới để sinh ra cấu trúc, sau đó bạn tự dán link ảnh vào các vị trí đánh dấu nhé!";
                 aiPromptBox.value = "Đóng vai là một giáo viên, hãy soạn cho tôi bài tập ([SỐ LƯỢNG] câu) dạng Ghép từ vào tranh về chủ đề [GHI CHỦ ĐỀ VÀO ĐÂY].\n\n" + multiQPrompt + "CẤU TRÚC CHUẨN MỖI CÂU:\nCâu [X]: [Nội dung yêu cầu bài tập]\nẢnh 1: [Mời bạn dán link ảnh 1 vào đây]\nĐáp án 1: [Từ khóa tương ứng ảnh 1]\nẢnh 2: [Mời bạn dán link ảnh 2 vào đây]\nĐáp án 2: [Từ khóa tương ứng ảnh 2]";
                 document.getElementById('image_match_row').style.display = 'block';
@@ -1171,7 +1241,24 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 btnPlay.onclick = () => {
                     document.getElementById('quizCreator').style.display = 'none';
                     document.getElementById('quizBankArea').style.display = 'none';
-                    socket.emit('createRoomWithData', { quizData: quiz.data, timeSetting: quiz.timeSetting });
+
+                    // Lấy giá trị cài đặt phòng thi
+                    const roomTheme = document.getElementById('roomTheme').value.trim();
+                    const roomBgColor = document.getElementById('roomBgColor').value;
+                    let roomBgImage = document.getElementById('presetBgImage').value;
+                    if (roomBgImage === 'custom') {
+                        roomBgImage = document.getElementById('roomBgImage').value.trim();
+                    }
+                    const showQuestionOnStudent = document.getElementById('showQuestionOnStudent').checked;
+
+                    socket.emit('createRoomWithData', { 
+                        quizData: quiz.data, 
+                        timeSetting: quiz.timeSetting,
+                        themeName: roomTheme,
+                        bgColor: roomBgColor,
+                        bgImage: roomBgImage,
+                        showStudentQuestion: showQuestionOnStudent
+                    });
                 };
                 
                 const btnEdit = document.createElement('button');
@@ -1478,9 +1565,26 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
         document.getElementById('btnCreateRoomFromData').addEventListener('click', () => {
             if (draftedQuestions.length === 0) { alert("Bạn chưa thêm câu hỏi nào vào đề!"); return; }
             customTimeSetting = parseInt(document.getElementById('timeSetting').value);
+
+            // Lấy giá trị cài đặt phòng thi
+            const roomTheme = document.getElementById('roomTheme').value.trim();
+            const roomBgColor = document.getElementById('roomBgColor').value;
+            let roomBgImage = document.getElementById('presetBgImage').value;
+            if (roomBgImage === 'custom') {
+                roomBgImage = document.getElementById('roomBgImage').value.trim();
+            }
+            const showQuestionOnStudent = document.getElementById('showQuestionOnStudent').checked;
+
             document.getElementById('quizCreator').style.display = 'none';
             document.getElementById('quizBankArea').style.display = 'none'; 
-            socket.emit('createRoomWithData', { quizData: draftedQuestions, timeSetting: customTimeSetting }); 
+            socket.emit('createRoomWithData', { 
+                quizData: draftedQuestions, 
+                timeSetting: customTimeSetting,
+                themeName: roomTheme,
+                bgColor: roomBgColor,
+                bgImage: roomBgImage,
+                showStudentQuestion: showQuestionOnStudent
+            }); 
             draftedQuestions = []; renderDraftList(); localStorage.removeItem('myDraftQuestions');
         });
 
@@ -1562,6 +1666,10 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             currentPin = pin; 
             document.getElementById('roomInfo').style.display = 'block'; 
             document.getElementById('pinDisplay').innerText = pin; 
+            document.getElementById('mainDashboardHeader').style.display = 'none';
+
+            // TỰ ĐỘNG ẨN BẢNG LƯU Ý ĐỂ RỘNG MÀN HÌNH
+            if(document.getElementById('serverNotice')) document.getElementById('serverNotice').style.display = 'none';
 
             // TẠO VÀ HIỂN THỊ MÃ QR CODE
             const studentUrl = `https://gameshow-thay-phuc1.onrender.com/?pin=${pin}`;
@@ -1578,27 +1686,54 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
         document.getElementById('btnBackToDashboard').addEventListener('click', () => {
             document.getElementById('roomInfo').style.display = 'none';
             document.getElementById('quizCreator').style.display = 'block';
+            document.getElementById('mainDashboardHeader').style.display = 'block';
+
+            // HIỆN LẠI BẢNG LƯU Ý KHI VỀ TRANG CHỦ
+            if(document.getElementById('serverNotice')) document.getElementById('serverNotice').style.display = 'block';
+
             loadQuizBank(); // Gọi lại hàm này để Kho đề tự động hiện ra
         });
 
         socket.on('showQuestion', (questionData) => {
+            window.currentQIdx = questionData.idx;
+            window.totalQs = questionData.total;
             isTickPlaying = false; tickSound.pause(); tickSound.currentTime = 0;
-            document.getElementById('gameScreen').style.display = 'block';
+            document.getElementById('gameScreen').style.display = 'flex';
+            document.getElementById('countdownSound').play().catch(e => console.log(e));
+            document.getElementById('mainDashboardHeader').style.display = 'none';
+
+            // ĐẢM BẢO BẢNG LƯU Ý LUÔN ẨN KHI ĐANG THI
+            if(document.getElementById('serverNotice')) document.getElementById('serverNotice').style.display = 'none';
+
+            document.getElementById('gameScreen').style.height = '100vh'; 
+            document.getElementById('gameScreen').style.minHeight = '';
+            
+            document.getElementById('questionText').style.display = 'flex';
+            document.getElementById('questionText').style.padding = '';
+            document.getElementById('questionText').style.margin = '';
             document.getElementById('questionText').innerText = questionData.question;
+            
             const imgContainer = document.getElementById('questionImagesContainer');
+            imgContainer.style.flexShrink = '1';
+            imgContainer.style.height = 'auto';
+            imgContainer.style.maxHeight = '35vh'; 
             imgContainer.innerHTML = ''; 
             
             let imgsToDisplay = questionData.images || [];
             if (imgsToDisplay.length === 0 && questionData.image) { imgsToDisplay = [questionData.image]; }
+
+            if (imgsToDisplay.length === 0) {
+                document.getElementById('questionText').style.fontSize = '3.5vw';
+                document.getElementById('questionText').style.fontWeight = '900';
+            }
 
             if (questionData.type === 'image_match' || questionData.type === 'drag_image') {
                 imgContainer.style.display = 'none'; 
             } else {
                 if(imgsToDisplay.length > 0) {
                     // Tự động tính toán chiều cao ảnh dựa trên số lượng
-                    let dynamicMaxHeight = '15vh'; // Mặc định cho 3 ảnh trở lên (chống tràn)
-                    if (imgsToDisplay.length === 1) dynamicMaxHeight = '35vh'; // 1 ảnh thì to rõ ràng
-                    else if (imgsToDisplay.length === 2) dynamicMaxHeight = '28vh'; // 2 ảnh thì to vừa phải
+                    document.getElementById('questionText').style.fontSize = '2.2vw';
+                    imgContainer.style.flex = '1';
 
                     imgsToDisplay.forEach((url, index) => {
                         const wrap = document.createElement('div');
@@ -1608,9 +1743,11 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                         const imgEl = document.createElement('img');
                         imgEl.src = url; 
                         imgEl.style.maxWidth = '100%'; 
-                        imgEl.style.maxHeight = dynamicMaxHeight; // Gán chiều cao động
+                        imgEl.style.maxHeight = '30vh'; 
+                        imgEl.style.width = 'auto';
                         imgEl.style.borderRadius = '8px'; 
                         imgEl.style.objectFit = 'contain';
+                        imgEl.onerror = function() { this.parentElement.style.display='none'; };
                         wrap.appendChild(imgEl);
                         
                         if (questionData.captions && questionData.captions[index]) {
@@ -1631,6 +1768,11 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             document.getElementById('timerDisplay').style.display = 'inline-block';
             document.getElementById('timeText').innerText = customTimeSetting;
             const answerList = document.getElementById('answerList');
+            answerList.style.minHeight = '';
+            answerList.style.maxHeight = '';
+            answerList.style.order = '';
+            answerList.style.marginTop = '';
+            answerList.style.flexShrink = '1';
             const teacherAnsBox = document.getElementById('teacherCorrectAnswerBox');
             answerList.innerHTML = ''; teacherAnsBox.style.display = 'none'; 
 
@@ -1642,9 +1784,9 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             document.getElementById('dragDropNotice').style.display = 'none';
             document.getElementById('imageMatchNotice').style.display = 'none';
             document.getElementById('classifyNotice').style.display = 'none';
-            document.getElementById('dragTextNotice').style.display = 'none';
             document.getElementById('dragImageNotice').style.display = 'none';
             document.getElementById('chartContainer').style.display = 'none';
+            document.getElementById('barChart').style.display = 'flex';
 
             if (questionData.type === 'fill_blank') {
                 document.getElementById('fillBlankNotice').style.display = 'block';
@@ -1715,7 +1857,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 });
                 html += '</div>'; teacherAnsBox.innerHTML = html;
             } else {
-                document.getElementById('chartContainer').style.display = 'flex';
+                document.getElementById('statsWrapper').style.display = 'flex';
                 answerList.style.display = 'grid';
                 questionData.answers.forEach(answer => {
                     const li = document.createElement('li'); const ansText = answer.substring(3); 
@@ -1739,7 +1881,12 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                 isTickPlaying = true;
             }
         });
-        socket.on('timeUp', () => { document.getElementById('timeText').innerText = "HẾT GIỜ!"; tickSound.pause(); timeoutSound.play().catch(e => console.log(e)); });
+        socket.on('timeUp', () => { 
+            document.getElementById('timeText').innerText = "HẾT GIỜ!"; 
+            tickSound.pause(); 
+            timeoutSound.play().catch(e => console.log(e)); 
+            const snd = document.getElementById('countdownSound'); if(snd) { snd.pause(); snd.currentTime = 0; }
+        });
 
         socket.on('updateStats', (data) => {
             document.getElementById('timerDisplay').style.display = 'none';
@@ -1749,16 +1896,83 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             const teacherAnsBox = document.getElementById('teacherCorrectAnswerBox');
             if (teacherAnsBox.innerHTML !== '') { teacherAnsBox.style.display = 'block'; }
 
-            if (document.getElementById('chartContainer').style.display !== 'none') {
-                const letters = ['A', 'B', 'C', 'D'];
-                data.answerCounts.forEach((count, index) => {
-                    document.getElementById(`count${letters[index]}`).innerText = count;
-                    const heightPx = (count / data.totalPlayers) * 200; 
-                    document.getElementById(`bar${letters[index]}`).style.height = `${heightPx}px`;
-                });
-            }
+            const letters = ['A', 'B', 'C', 'D'];
+            data.answerCounts.forEach((count, index) => {
+                document.getElementById(`count${letters[index]}`).innerText = count;
+                const heightPercent = data.totalPlayers > 0 ? (count / data.totalPlayers) * 100 : 0; 
+                document.getElementById(`bar${letters[index]}`).style.height = `${heightPercent}%`;
+            });
+
             if (data.forceShowNext || data.answeredCount === data.totalPlayers) { 
+                document.getElementById('chartContainer').style.display = 'flex';
                 document.getElementById('btnNextQuestion').style.display = 'inline-block'; 
+                
+                const ansList = document.getElementById('answerList');
+                if(ansList) {
+                    ansList.style.minHeight = 'auto';
+                    ansList.style.maxHeight = 'none';
+                    ansList.style.order = '3';
+                    ansList.style.flexShrink = '0';
+                    ansList.style.marginTop = '10px';
+                    
+                    // Mạnh tay ép xẹp các khối nút đáp án
+                    Array.from(ansList.children).forEach(li => {
+                        li.style.padding = '10px';
+                        li.style.fontSize = '18px';
+                        li.style.minHeight = '40px';
+                        const img = li.querySelector('img');
+                        if (img) img.style.maxHeight = '50px';
+                    });
+                }
+                
+                const qText = document.getElementById('questionText');
+                if(qText) {
+                    qText.style.fontSize = '2.2vw';
+                    qText.style.padding = '0';
+                    qText.style.margin = '5px 0';
+                }
+
+                const imgContainer = document.getElementById('questionImagesContainer');
+                if(imgContainer) {
+                    imgContainer.style.display = 'flex';
+                    imgContainer.style.flexShrink = '0'; 
+                    imgContainer.style.height = '25vh'; 
+                    imgContainer.style.maxHeight = '250px';
+                }
+
+                const chartCont = document.getElementById('chartContainer');
+                if(chartCont) {
+                    chartCont.style.maxHeight = 'none';
+                    chartCont.style.height = 'auto';
+                }
+
+                // Expand gameScreen if needed instead of squishing
+                document.getElementById('gameScreen').style.height = 'auto';
+                document.getElementById('gameScreen').style.minHeight = '100vh';
+
+                const lbContainer = document.getElementById('miniLeaderboardContainer');
+                if (lbContainer) {
+                    lbContainer.style.display = 'block'; 
+                    if (data.currentLeaderboard && data.currentLeaderboard.length > 0) {
+                        let html = '<h3 style="color: #4CAF50; margin-top: 0; font-size: 18px; text-align: center; margin-bottom: 5px;">🏆 TOP 5 TẠM THỜI 🏆</h3>';
+                        data.currentLeaderboard.slice(0, 5).forEach((p, idx) => {
+                            html += `<div style="display: flex; justify-content: space-between; border-bottom: 1px dashed #eee; padding: 4px 0; font-size: 16px;">
+                                        <span><b style="color:#555;">#${idx + 1}</b> <span style="font-weight:bold; color:#333;">${p.name}</span></span>
+                                        <span style="color: #E65100; font-weight: 900;">${p.score} điểm</span>
+                                     </div>`;
+                        });
+                        lbContainer.innerHTML = html;
+                    } else {
+                        lbContainer.innerHTML = '<h3 style="color: #4CAF50; margin-top: 0; font-size: 18px; text-align: center; margin-bottom: 5px;">🏆 TOP 5 TẠM THỜI 🏆</h3><p style="text-align:center; margin: 0; font-size: 14px;">Chưa có dữ liệu</p>';
+                    }
+                }
+                
+                if (window.currentQIdx >= window.totalQs - 1) {
+                    document.getElementById('btnNextQuestion').innerText = 'Xem Bảng Tổng Kết 🏆';
+                } else {
+                    document.getElementById('btnNextQuestion').innerText = 'Câu tiếp theo ⏭️';
+                }
+
                 // Ẩn các dòng chữ thông báo đang chờ
                 document.getElementById('fillBlankNotice').style.display = 'none';
                 document.getElementById('dragDropNotice').style.display = 'none';
