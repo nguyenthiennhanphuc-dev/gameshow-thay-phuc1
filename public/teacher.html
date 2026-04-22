@@ -343,7 +343,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
         <audio id="countdownSound" src="https://assets.mixkit.co/active_storage/sfx/2568/2568-preview.mp3" preload="auto" loop></audio>
         <div id="timerDisplay">⏳ <span id="timeText">20</span></div>
         <h2 id="questionText">Câu hỏi sẽ hiện ở đây</h2>
-        <div id="questionImagesContainer" style="display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 15px; margin-bottom: 20px; max-height: 35vh; overflow-y: hidden; overflow-x: auto; padding-bottom: 10px; width: 100%;"></div>
+        <div id="questionImagesContainer" style="display: flex; flex-wrap: nowrap; justify-content: flex-start; gap: 12px; margin-bottom: 10px; max-height: 28vh; overflow-y: hidden; overflow-x: auto; padding-bottom: 5px; width: 100%;"></div>
         <div id="questionDetailedContent" style="margin-bottom: 12px; font-size: 20px; color: #333; background: rgba(255,255,255,0.92); backdrop-filter: blur(10px); padding: 16px; border-radius: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.15); display: none; text-align: left; border: 1px solid rgba(255,255,255,0.3);"></div>
         <div id="statsArea" style="display: none; width: 100%; margin-bottom: 5px; flex-shrink: 0;">
             <h3 style="font-size: 18px; color: #555; margin-bottom: 5px;">Thống kê: <span id="answeredRatio">0/0</span> đã trả lời</h3>
@@ -1664,14 +1664,14 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             const imgContainer = document.getElementById('questionImagesContainer');
             imgContainer.style.flexShrink = '1';
             imgContainer.style.height = 'auto';
-            imgContainer.style.maxHeight = '35vh'; 
+            imgContainer.style.maxHeight = '28vh'; 
             imgContainer.innerHTML = ''; 
             
             let imgsToDisplay = questionData.images || [];
             if (imgsToDisplay.length === 0 && questionData.image) { imgsToDisplay = [questionData.image]; }
 
             if (imgsToDisplay.length === 0) {
-                document.getElementById('questionText').style.fontSize = '3.5vw';
+                document.getElementById('questionText').style.fontSize = 'clamp(18px, 3vw, 32px)';
                 document.getElementById('questionText').style.fontWeight = '900';
             }
 
@@ -1680,7 +1680,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
             } else {
                 if(imgsToDisplay.length > 0) {
                     // Tự động tính toán chiều cao ảnh dựa trên số lượng
-                    document.getElementById('questionText').style.fontSize = '2.2vw';
+                    document.getElementById('questionText').style.fontSize = 'clamp(14px, 2vw, 24px)';
                     imgContainer.style.flex = '1';
 
                     imgsToDisplay.forEach((url, index) => {
@@ -1691,7 +1691,7 @@ Dưới đây là đề thi thô của tôi, hãy bắt đầu chuẩn hóa:
                         const imgEl = document.createElement('img');
                         imgEl.src = url; 
                         imgEl.style.maxWidth = '100%'; 
-                        imgEl.style.maxHeight = '30vh'; 
+                        imgEl.style.maxHeight = '24vh'; 
                         imgEl.style.width = 'auto';
                         imgEl.style.borderRadius = '8px'; 
                         imgEl.style.objectFit = 'contain';

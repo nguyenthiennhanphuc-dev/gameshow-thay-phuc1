@@ -44,40 +44,40 @@
         <p style="color: #666;">Hãy nhìn lên màn hình của giáo viên và chờ trò chơi bắt đầu...</p>
     </div>
 
-    <div id="playScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; flex-direction: column; justify-content: flex-start; align-items: center; padding: 48px 3vw 10px 3vw; box-sizing: border-box; background: transparent; z-index: 100; overflow-y: auto; overflow-x: hidden;">
+    <div id="playScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; flex-direction: column; justify-content: flex-start; align-items: center; padding: 44px 3vw 10px 3vw; box-sizing: border-box; background: transparent; z-index: 100; overflow-y: auto; overflow-x: hidden;">
         
         <div id="studentQuestionDisplay" style="width: 100%; display: flex; align-items: center; justify-content: center; text-align: center; flex: 0 0 auto; font-size: clamp(14px, 3vw, 26px); font-weight: 900; line-height: 1.25; padding: 8px 5px; color: #fff; background: none; box-shadow: none; margin: 0 0 4px 0; transition: all 0.3s ease; box-sizing: border-box; order: 1; word-break: break-word; overflow-wrap: break-word;"></div>
         
         <div id="studentImageGallery" style="order: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; width: 100%; margin-bottom: 6px; padding-bottom: 2px; max-height: 25vh; overflow-y: auto; flex-shrink: 1;"></div>
         
-        <ul id="studentAnswerList" style="order: 3; width: 100%; max-width: 1800px; flex: 1 1 auto; min-height: 0; gap: 10px; margin-bottom: 6px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; list-style: none; padding: 0; margin-top: 4px; box-sizing: border-box; display: none;"></ul>
+        <ul id="studentAnswerList" style="order: 3; width: 100%; max-width: 1800px; flex: 0 0 auto; min-height: 0; gap: 10px; margin-bottom: 6px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; list-style: none; padding: 0; margin-top: 4px; box-sizing: border-box; display: none;"></ul>
 
-        <h2 id="questionIndicator" style="display: none;">Chọn đáp án:</h2>
+        <h2 id="questionIndicator" style="display: none; order: 3;">Chọn đáp án:</h2>
         
-        <div class="answerGrid" id="btnContainer" style="display:none;">
+        <div class="answerGrid" id="btnContainer" style="display:none; order: 4;">
             <button class="answerBtn btn-a" data-index="0" id="btnA">A</button>
             <button class="answerBtn btn-b" data-index="1" id="btnB">B</button>
             <button class="answerBtn btn-c" data-index="2" id="btnC">C</button>
             <button class="answerBtn btn-d" data-index="3" id="btnD">D</button>
         </div>
 
-        <div id="fillBlankContainer">
+        <div id="fillBlankContainer" style="order: 4;">
             <input type="text" id="fillBlankInput" placeholder="Gõ câu trả lời vào đây..." autocomplete="off">
             <button id="btnSubmitFillBlank" class="actionBtn">🚀 Gửi Đáp Án</button>
         </div>
 
-        <div id="dragDropContainer">
+        <div id="dragDropContainer" style="order: 4;">
             <p style="color: #E65100; font-weight: bold; margin-bottom: 15px; font-size: 18px;">Kéo thả các khối để sắp xếp đúng thứ tự (1, 2, 3...):</p>
             <ul id="sortableList"></ul>
             <button id="btnSubmitDragDrop" class="actionBtn">🚀 Chốt Đáp Án</button>
         </div>
 
-        <div id="imageMatchContainer">
+        <div id="imageMatchContainer" style="order: 4;">
             <div class="image-match-grid" id="imageMatchGrid"></div>
             <button id="btnSubmitImageMatch" class="actionBtn">🚀 Chốt Đáp Án Ghép Tranh</button>
         </div>
 
-        <div id="classifyContainer">
+        <div id="classifyContainer" style="order: 4;">
             <div class="word-bank" id="wordBankArea">
                 <div class="word-bank-title">👇 KHO TỪ (Kéo các từ ở đây thả xuống các giỏ)</div>
                 <div id="wordBankList" style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; min-height: 50px; align-items: center; justify-content: center;"></div>
@@ -86,7 +86,7 @@
             <button id="btnSubmitClassify" class="actionBtn">🚀 Chốt Đáp Án Phân Loại</button>
         </div>
 
-        <div id="dragTextContainer">
+        <div id="dragTextContainer" style="order: 4;">
             <div class="word-bank" id="dragTextWordBankArea" style="background: #E8EAF6; border-color: #3F51B5;">
                 <div class="word-bank-title" style="color: #1A237E;">👇 KHO TỪ (Kéo từ để lấp vào ô trống)</div>
                 <div id="dragTextWordBank" style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; min-height: 50px; align-items: center; justify-content: center;"></div>
@@ -95,7 +95,7 @@
             <button id="btnSubmitDragText" class="actionBtn">🚀 Chốt Đáp Án Đoạn Văn</button>
         </div>
 
-        <div id="dragImageContainer">
+        <div id="dragImageContainer" style="order: 4;">
             <div class="word-bank" id="dragImageWordBankArea" style="background: #E8F5E9; border-color: #4CAF50;">
                 <div class="word-bank-title" style="color: #1B5E20;">👇 KHO TỪ (Kéo nhãn dán thả vào đúng vị trí trên ảnh)</div>
                 <div id="dragImageWordBank" style="display: flex; flex-wrap: wrap; gap: 10px; width: 100%; min-height: 50px; align-items: center; justify-content: center;"></div>

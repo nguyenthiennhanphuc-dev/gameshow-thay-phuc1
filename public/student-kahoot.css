@@ -198,20 +198,21 @@ button.actionBtn:hover {
 #studentAnswerList li {
     border-radius: 12px !important; 
     font-weight: 800 !important; 
-    font-size: clamp(16px, 2.2vw, 24px) !important; 
+    font-size: clamp(15px, 2.2vw, 22px) !important; 
     box-shadow: 0 5px 0 rgba(0,0,0,0.3) !important; 
     color: white !important; 
     border: none !important; 
     display: flex !important; 
     align-items: center !important; 
     justify-content: center !important; 
-    padding: 12px !important; 
+    padding: 10px !important; 
     cursor: pointer !important; 
     text-align: center !important; 
     transition: transform 0.1s !important; 
     box-sizing: border-box !important; 
     margin: 0 !important; 
-    min-height: 55px !important;
+    min-height: 50px !important;
+    max-height: 120px !important;
     font-family: 'Montserrat', sans-serif !important;
     text-shadow: 0 2px 4px rgba(0,0,0,0.4) !important;
     position: relative !important;
@@ -227,33 +228,18 @@ button.actionBtn:hover {
 }
 #studentAnswerList li:active { transform: scale(0.95) translateY(4px) !important; box-shadow: 0 2px 0 rgba(0,0,0,0.3) !important; }
 
-/* Mobile answer list */
-@media (max-width: 768px) {
-    #studentAnswerList li { 
-        font-size: 15px !important; 
-        min-height: 50px !important; 
-        padding: 8px !important;
-    }
-    #studentAnswerList { gap: 8px !important; }
-    #playScreen { padding-top: 42px !important; padding-bottom: 8px !important; }
-    #studentQuestionDisplay { 
-        font-size: clamp(12px, 3.5vw, 18px) !important; 
-        padding: 6px 8px !important;
-        max-height: 18vh !important;
-    }
-    #miniScore, #miniTimer { font-size: 12px !important; padding: 4px 10px !important; }
-    .answerBtn { height: 70px !important; font-size: 20px !important; }
-}
-
-@media (max-height: 700px) {
-    #studentAnswerList li { min-height: 40px !important; padding: 6px !important; font-size: 14px !important; }
-    #studentQuestionDisplay { max-height: 15vh !important; padding: 5px 8px !important; }
-    #studentImageGallery img { max-height: 12vh !important; }
+/* --- FORCE LAYOUT ORDER for all containers inside playScreen --- */
+#fillBlankContainer, #dragDropContainer, #imageMatchContainer,
+#classifyContainer, #dragTextContainer, #dragImageContainer,
+.answerGrid {
+    order: 4 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
 }
 
 /* Student answer list enhanced */
 #studentAnswerList {
-    gap: 14px !important;
+    gap: 10px !important;
 }
 #studentAnswerList li:nth-child(1) { background: linear-gradient(135deg, #E21B3C, #c0162f) !important; box-shadow: 0 6px 0 #8e1020, 0 8px 15px rgba(226,27,60,0.3) !important; }
 #studentAnswerList li:nth-child(2) { background: linear-gradient(135deg, #1368CE, #0d4ea3) !important; box-shadow: 0 6px 0 #093879, 0 8px 15px rgba(19,104,206,0.3) !important; }
@@ -270,13 +256,56 @@ button.actionBtn:hover {
     padding: 8px 10px !important;
     border: 1px solid rgba(255,255,255,0.15) !important;
     backdrop-filter: blur(10px) !important;
-    font-size: clamp(13px, 3vw, 26px) !important;
+    font-size: clamp(13px, 3vw, 24px) !important;
     line-height: 1.25 !important;
     margin-bottom: 4px !important;
     -webkit-font-smoothing: antialiased !important;
-    max-height: 20vh !important;
+    max-height: 22vh !important;
     overflow-y: auto !important;
     word-break: break-word !important;
+}
+
+/* Image gallery constraints */
+#studentImageGallery {
+    max-height: 22vh !important;
+    overflow-y: auto !important;
+}
+#studentImageGallery img {
+    max-height: 18vh !important;
+    max-width: 46% !important;
+    object-fit: contain !important;
+    border-radius: 8px !important;
+}
+
+/* --- MOBILE RESPONSIVE --- */
+@media (max-width: 768px) {
+    #studentAnswerList li { 
+        font-size: 14px !important; 
+        min-height: 45px !important; 
+        max-height: 100px !important;
+        padding: 8px !important;
+    }
+    #studentAnswerList { gap: 8px !important; }
+    #playScreen { padding-top: 40px !important; padding-bottom: 8px !important; }
+    #studentQuestionDisplay { 
+        font-size: clamp(12px, 3.5vw, 18px) !important; 
+        padding: 6px 8px !important;
+        max-height: 18vh !important;
+    }
+    #studentImageGallery { max-height: 18vh !important; }
+    #studentImageGallery img { max-height: 14vh !important; }
+    #miniScore, #miniTimer { font-size: 12px !important; padding: 4px 10px !important; }
+    .answerBtn { height: 60px !important; font-size: 18px !important; }
+    #fillBlankInput { font-size: 18px !important; padding: 14px !important; }
+    .sortable-item { padding: 10px 10px 10px 50px !important; font-size: 15px !important; }
+    .drag-item { font-size: 14px !important; padding: 8px 12px !important; }
+}
+
+@media (max-height: 700px) {
+    #studentAnswerList li { min-height: 38px !important; padding: 6px !important; font-size: 13px !important; max-height: 80px !important; }
+    #studentQuestionDisplay { max-height: 15vh !important; padding: 5px 8px !important; }
+    #studentImageGallery { max-height: 15vh !important; }
+    #studentImageGallery img { max-height: 12vh !important; }
 }
 
 /* playScreen full-screen scroll support */
