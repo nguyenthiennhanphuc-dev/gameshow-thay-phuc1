@@ -2,6 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Màn hình Học sinh</title>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     
@@ -43,13 +44,13 @@
         <p style="color: #666;">Hãy nhìn lên màn hình của giáo viên và chờ trò chơi bắt đầu...</p>
     </div>
 
-    <div id="playScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; flex-direction: column; justify-content: flex-start; align-items: center; padding: 50px 3vw 15px 3vw; box-sizing: border-box; background: transparent; z-index: 100; overflow-y: auto; overflow-x: hidden;">
+    <div id="playScreen" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; height: 100dvh; flex-direction: column; justify-content: flex-start; align-items: center; padding: 48px 3vw 10px 3vw; box-sizing: border-box; background: transparent; z-index: 100; overflow-y: auto; overflow-x: hidden;">
         
-        <div id="studentQuestionDisplay" style="width: 100%; display: flex; align-items: center; justify-content: center; text-align: center; flex: 0 0 auto; font-size: 4vw; font-weight: 900; line-height: 1.25; padding: 10px 5px; color: #fff; background: none; box-shadow: none; margin: 0 0 8px 0; transition: all 0.3s ease; box-sizing: border-box; order: 1;"></div>
+        <div id="studentQuestionDisplay" style="width: 100%; display: flex; align-items: center; justify-content: center; text-align: center; flex: 0 0 auto; font-size: clamp(14px, 3vw, 26px); font-weight: 900; line-height: 1.25; padding: 8px 5px; color: #fff; background: none; box-shadow: none; margin: 0 0 4px 0; transition: all 0.3s ease; box-sizing: border-box; order: 1; word-break: break-word; overflow-wrap: break-word;"></div>
         
-        <div id="studentImageGallery" style="order: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; width: 100%; margin-bottom: 10px; padding-bottom: 5px; max-height: 35vh; overflow-y: auto;"></div>
+        <div id="studentImageGallery" style="order: 2; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; width: 100%; margin-bottom: 6px; padding-bottom: 2px; max-height: 25vh; overflow-y: auto; flex-shrink: 1;"></div>
         
-        <ul id="studentAnswerList" style="order: 3; width: 100%; max-width: 1800px; flex: 0 0 auto; min-height: 0; gap: 12px; margin-bottom: 10px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: auto auto; list-style: none; padding: 0; margin-top: 8px; box-sizing: border-box; display: none;"></ul>
+        <ul id="studentAnswerList" style="order: 3; width: 100%; max-width: 1800px; flex: 1 1 auto; min-height: 0; gap: 10px; margin-bottom: 6px; display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; list-style: none; padding: 0; margin-top: 4px; box-sizing: border-box; display: none;"></ul>
 
         <h2 id="questionIndicator" style="display: none;">Chọn đáp án:</h2>
         
@@ -252,7 +253,7 @@
                 payload.questionImages.forEach(url => {
                     const img = document.createElement('img');
                     img.src = url;
-                    img.style.cssText = 'max-height: 20vh; max-width: 48%; object-fit: contain; border-radius: 8px; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);';
+                    img.style.cssText = 'max-height: 15vh; max-width: 45%; object-fit: contain; border-radius: 8px; border: 2px solid #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1);';
                     img.onerror = function() { this.style.display = 'none'; };
                     gallery.appendChild(img);
                 });
@@ -260,12 +261,12 @@
                 hasContent = true;
                 
                 // Thu nhỏ chữ nếu có ảnh
-                qText.style.fontSize = '3.5vw';
-                qText.style.flex = '0.5';
+                qText.style.fontSize = 'clamp(13px, 2.5vw, 22px)';
+                qText.style.flex = '0 0 auto';
             } else {
                 // Phóng to chữ nếu không có ảnh
-                qText.style.fontSize = '4.5vw';
-                qText.style.flex = '1';
+                qText.style.fontSize = 'clamp(14px, 3vw, 26px)';
+                qText.style.flex = '0 0 auto';
             }
 
             if (hasContent) {
